@@ -67,8 +67,8 @@ function CategoryMainPage({ params }: { params: { id: number } }) {
   };
 
   return (
-    <div className="mt-4 w-full min-h-60">
-      <div className=" bg-gray-100 w-full p-5 items-center ">
+    <div className="mt-4 min-h-60">
+      <div className=" bg-gray-100  p-5 items-center ">
         {/*  <span className="text-white">Home \ {categoryName}</span> */}
         <Breadcrumb aria-label="Default breadcrumb example">
           <Breadcrumb.Item href="#" icon={HiHome}>
@@ -81,7 +81,7 @@ function CategoryMainPage({ params }: { params: { id: number } }) {
       <div className="flex flex-col-reverse md:flex-row m-4  ">
         <div className="basis-1/5 md:mr-2">
           <SideCategory />
-          {/* <div className="flex flex-col mt-2">
+          <div className="flex flex-col mt-2">
             <div className="flex flex-row justify-between">
               <span className="text-lg font-semibold">Filter</span>
               <button
@@ -92,7 +92,7 @@ function CategoryMainPage({ params }: { params: { id: number } }) {
               </button>
             </div>
           </div>
-          <PriceFilter />
+          {/* <PriceFilter />
           <OptionsFilter /> */}
         </div>
 
@@ -125,7 +125,7 @@ function CategoryMainPage({ params }: { params: { id: number } }) {
           </div>
 
           <div
-            className={` grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 ${
+            className={`mt-2 grid grid-cols-2 md:grid-cols-3 gap-2 ${
               viewMode === 'list' ? 'hidden' : ''
             }`}
           >

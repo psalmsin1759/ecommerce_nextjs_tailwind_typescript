@@ -10,9 +10,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primaryColor: '#AA26F9',
+        primaryColor: '#080402',
         footerColor: '#0C0F20',
         footerTextColor: '#B0B4B8',
+        goldColor: '#D2AB62',
       },
     },
   },

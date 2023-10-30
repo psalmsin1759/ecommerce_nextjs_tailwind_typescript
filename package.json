@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 4000",
+    "dev": "next dev -p 5000",
     "build": "next build",
-    "start": "next start -p 4000",
+    "start": "next start -p 5000",
     "lint": "next lint"
   },
   "dependencies": {
@@ -22,6 +22,7 @@
     "flowbite-react": "^0.6.4",
     "framer-motion": "^10.16.4",
     "next": "13.5.5",
+    "qs": "^6.11.2",
     "react": "^18",
     "react-dom": "^18",
     "react-google-autocomplete": "^2.7.3",
@@ -34,6 +35,7 @@
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/qs": "^6.9.9",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10",

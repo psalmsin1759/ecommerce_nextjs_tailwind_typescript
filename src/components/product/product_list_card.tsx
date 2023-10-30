@@ -75,18 +75,18 @@ function ProductListCard({ product }: ProductCardProps) {
             {product.description}
           </span>
 
-          {product.discounted_price !== '0' ? (
+          {product.discounted_price !== 0 ? (
             <div className="flex flex-row gap-2 items-center">
               <span className="text-xl font-semibold">
-                ${product.discounted_price}
+                ₦{product.discounted_price}
               </span>
               <del>
                 {' '}
-                <span className="text-md text-gray-500">${product.price}</span>
+                <span className="text-md text-gray-500">₦{product.price}</span>
               </del>
             </div>
           ) : (
-            <span className="text-xl font-semibold">${product.price}</span>
+            <span className="text-xl font-semibold">₦{product.price}</span>
           )}
 
           <div className="flex flex-row gap-2 justify-center">
@@ -151,7 +151,7 @@ function ProductListCard({ product }: ProductCardProps) {
                 </div>
                 <hr className="mt-4 mb-4" />
                 <span className="text-2xl mt-4 mb-4 font-semibold">
-                  ${product.price}
+                  ₦{product.price}
                 </span>
                 <hr className="mt-4" />
                 <div className="flex flex-row mt-4 gap-4 items-center">

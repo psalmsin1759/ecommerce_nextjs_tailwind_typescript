@@ -3,7 +3,6 @@ import Footer from '@/components/common/footer';
 import Slider from '@/components/slider/slider';
 import HomeBanner from '@/components/banner/home_banner';
 import FeaturedProducts from '@/components/featured/featured';
-import ScrollToTop from 'react-scroll-to-top';
 
 export default function Home() {
   return (

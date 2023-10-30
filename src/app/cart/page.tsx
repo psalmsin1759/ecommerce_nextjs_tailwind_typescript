@@ -76,7 +76,7 @@ function CartPage() {
             <span className="text-3xl font-semibold">Cart totals</span>
             <div className="flex flex-row justify-between mt-12 mb-4">
               <span>Subtotal</span>
-              <span>${grandTotal}</span>
+              <span>₦{grandTotal}</span>
             </div>
             <hr className="text-black" />
             <div className="flex flex-row justify-between mt-6 mb-4">
@@ -86,10 +86,10 @@ function CartPage() {
             <hr />
             <div className="flex flex-row justify-between mt-6 mb-4">
               <span>Total</span>
-              <span className="text-2xl font-semibold">${grandTotal}</span>
+              <span className="text-2xl font-semibold">₦{grandTotal}</span>
             </div>
             <Link href={'/checkout'}>
-              <div className="w-full rounded-full bg-black hover:bg-primaryColor p-2 text-center mt-6">
+              <div className="w-full rounded-full bg-black hover:bg-goldColor p-2 text-center mt-6">
                 <span className="text-xl text-white">Proceed to checkout</span>
               </div>
             </Link>

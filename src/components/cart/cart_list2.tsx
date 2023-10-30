@@ -115,7 +115,7 @@ function CartList2({ product }: ProductCardProps) {
         </div>
         <div className="hidden md:block p-6 text-center">
           {' '}
-          <span className="text-red-500">${product.price}</span>
+          <span className="text-red-500">₦{product.price}</span>
         </div>
         <div className="hidden md:block p-6 text-center ">
           <div className="rounded-full w-32 pl-4 pr-4 pt-2 pb-2 border-2 flex flex-row items-center justify-between gap-2">
@@ -157,7 +157,7 @@ function CartList2({ product }: ProductCardProps) {
           </div>
         </div>
         <div className="hidden md:block p-6 text-center">
-          <span className="text-red-500">{subtotal}</span>
+          <span className="text-red-500">₦{subtotal}</span>
         </div>
       </div>
     </div>

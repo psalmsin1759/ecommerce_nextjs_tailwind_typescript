@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent, useCallback } from 'react';
 import { Breadcrumb } from 'flowbite-react';
 import { HiHome } from 'react-icons/hi';
 import Footer from '@/components/common/footer';
@@ -9,6 +9,7 @@ import { GoCheckCircleFill } from 'react-icons/go';
 import CartCheckoutList from '@/components/cart/cart_checkout_list';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from '@/api/axios';
+import qs from 'qs';
 import {
   selectCartItems,
   selectTotalGrandPrice,
@@ -17,6 +18,8 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Coupon, applyCoupon } from '@/model/coupon';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useUser } from '@/context/UserContext';
 
 import { loadStripe, Stripe } from '@stripe/stripe-js';
 import {
@@ -28,6 +31,7 @@ import {
   CardExpiryElement,
   Elements,
 } from '@stripe/react-stripe-js';
+import QueryString from 'qs';
 
 declare const google: any;
 
@@ -37,9 +41,11 @@ interface IFormInput {
   email: string;
   firstName: string;
   lastName: string;
+  //address: string;
   city: string;
   state: string;
   postalCode: string;
+  country: string;
   phone: string;
 }
 
@@ -74,6 +80,7 @@ function CheckoutPage() {
   );
 
   const [selectedCountry, setSelectedCountry] = useState<string>('GB');
+  const [selectedAddress, setSelectedAddress] = useState<string>('');
 
   const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCountry(event.target.value);
@@ -92,6 +99,8 @@ function CheckoutPage() {
           if (status === google.maps.places.PlacesServiceStatus.OK) {
             const addressComponents = placeDetails.address_components;
 
+            const fullAddress = placeDetails.formatted_address;
+
             // Initialize variables to store city, state, and postal code
             let city = '';
             let state = '';
@@ -109,6 +118,8 @@ function CheckoutPage() {
                 postalCode = component.long_name;
               }
             }
+
+            setSelectedAddress(fullAddress);
 
             reset({
               city,
@@ -129,32 +140,13 @@ function CheckoutPage() {
   const cartItems = useSelector(selectCartItems);
   const grandTotal = useSelector(selectTotalGrandPrice);
 
-  const validationSchema = Yup.object().shape({
-    email: Yup.string().required('Email is required').email('Email is invalid'),
-    firstName: Yup.string().required('First Name is required'),
-    lastName: Yup.string().required('Last Name is required'),
-    city: Yup.string().required('city is required'),
-    state: Yup.string().required('State is required'),
-    postalCode: Yup.string().required('Postal Code is required'),
-    phone: Yup.string().required('Phone is required'),
-  });
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<IFormInput>({
-    resolver: yupResolver(validationSchema),
-  });
-
   const [selectedShippingMethod, setSelectedShippingMethod] =
     useState<ShippingMethod>('Standard');
 
   // Define the shipping cost for each method
   const shippingCosts = {
-    Standard: 5,
-    Express: 16,
+    Standard: 1000,
+    Express: 2000,
   };
 
   // Calculate the shipping cost based on the selected method
@@ -211,17 +203,129 @@ function CheckoutPage() {
 
   const [clientSecret, setClientSecret] = useState('');
 
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().required('Email is required').email('Email is invalid'),
+    firstName: Yup.string().required('First Name is required'),
+    lastName: Yup.string().required('Last Name is required'),
+    //address: Yup.string().required('address is required'),
+    city: Yup.string().required('city is required'),
+    state: Yup.string().required('State is required'),
+    postalCode: Yup.string().required('Postal Code is required'),
+    phone: Yup.string().required('Phone is required'),
+    country: Yup.string().required('Country is required'),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<IFormInput>({
+    resolver: yupResolver(validationSchema),
+  });
+
+  const { state } = useUser();
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = () => {
+    if (state.user) {
+      /* reset({
+        firstName: state.user.firstName,
+        lastName: state.user.lastName,
+        email: state.user.email,
+        city: state.user.city,
+        state: state.user.state,
+        postalCode: state.user.postalCode,
+      }); */
+    }
+  };
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams);
+      params.set(name, value);
+
+      return params.toString();
+    },
+    [searchParams]
+  );
+
   const onSubmit = async (data: IFormInput) => {
-    console.log(JSON.stringify(data, null, 2));
+    console.log('hello');
+    console.log('Form data:', data);
+    console.log(selectedAddress);
+    console.log(total);
+    // console.log('shipping method: ' + selectedShippingMethod);
+    // console.log('shipping cost: ' + shippingCost);
+    //console.log('selected country: ' + selectedCountry);
 
-    console.log('shipping method: ' + selectedShippingMethod);
-    console.log('shipping cost: ' + shippingCost);
-    console.log('selected country: ' + selectedCountry);
+    const min = 1000000; // Smallest 7-digit number
+    const max = 9999999; // Largest 7-digit number
 
+    const randomOrderId = Math.floor(Math.random() * (max - min + 1)) + min;
+
+    const input = {
+      orderid: randomOrderId,
+      first_name: data.firstName,
+      last_name: data.lastName,
+      email: data.email,
+      phone: data.phone,
+      payment_method: selectedShippingMethod,
+      total_price: total,
+      tax: 0,
+      status: 'Success',
+      discount: discount,
+      currency: 'NGR',
+      shipping_price: shippingCost,
+      shipping_address: selectedAddress,
+      shipping_postalcode: data.postalCode,
+      shipping_city: data.city,
+      shipping_state: data.state,
+      shipping_country: selectedCountry,
+      cart_items: '',
+    };
+
+    const URL = '/placeOrder';
+
+    const response = await axios.post(URL, qs.stringify(input), {
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    });
+
+    console.log(response);
+
+    if (response?.data.success) {
+      const total = response.data.total;
+      const orderID = response.data.orderid;
+      const purchaseDate = response.data.purchasedate;
+
+      const url = '/status';
+
+      router.push(
+        url +
+          '?' +
+          createQueryString('orderid', orderID) +
+          '&' +
+          createQueryString('total', total) +
+          '&' +
+          createQueryString('purchasedate', purchaseDate)
+      );
+    } else {
+      const message = response.data.message;
+      alert(message);
+    }
+
+    /*
     const stripe = useStripe();
     const elements = useElements();
 
-    /*   const { error, paymentMethod } = await stripe?.createPaymentMethod({
+      const { error, paymentMethod } = await stripe?.createPaymentMethod({
       type: 'card',
       card: elements.getElement(
         CardCvcElement,
@@ -238,7 +342,7 @@ function CheckoutPage() {
       confirmParams: {
         return_url: 'https://example.com/order/123/complete',
       },
-    }); */
+    }); 
 
     const responseData = await axios.post('create-payment-intent', {
       data: { amount: 89 },
@@ -246,7 +350,7 @@ function CheckoutPage() {
 
     const clientSecret = responseData;
 
-    /*  await stripe?.confirmCardPayment(clientSecret, {
+      await stripe?.confirmCardPayment(clientSecret, {
       payment_method: { card: cardElement },
     }); */
   };
@@ -277,7 +381,6 @@ function CheckoutPage() {
                 id="email"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
                 placeholder=""
-                required
                 {...register('email')}
               />
               <span className="text-red-500">{errors.email?.message}</span>
@@ -298,7 +401,6 @@ function CheckoutPage() {
                   id="firstname"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
                   placeholder=""
-                  required={true}
                   {...register('firstName')}
                 />
                 <span className="text-red-500">
@@ -314,7 +416,6 @@ function CheckoutPage() {
                   id="lastname"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
                   placeholder=""
-                  required
                   {...register('lastName')}
                 />
                 <span className="text-red-500">
@@ -330,8 +431,9 @@ function CheckoutPage() {
                 </label>
                 <select
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
-                  value={selectedCountry}
-                  onChange={handleCountryChange}
+                  {...register('country')} // Bind to the 'country' field
+                  value={selectedCountry} // Set the selected value
+                  onChange={handleCountryChange} // Handle change event
                 >
                   <option value="">Select a country</option>
                   {countries.map((country) => (
@@ -366,7 +468,6 @@ function CheckoutPage() {
                   id="city"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
                   placeholder=""
-                  required={true}
                   {...register('city')}
                 />
                 <span className="text-red-500">{errors.city?.message}</span>
@@ -380,7 +481,6 @@ function CheckoutPage() {
                   id="state"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
                   placeholder=""
-                  required={true}
                   {...register('state')}
                 />
                 <span className="text-red-500">{errors.state?.message}</span>
@@ -396,7 +496,6 @@ function CheckoutPage() {
                   id="postalcode"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
                   placeholder=""
-                  required={true}
                   {...register('postalCode')}
                 />
                 <span className="text-red-500">
@@ -412,7 +511,6 @@ function CheckoutPage() {
                   id="phone"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
                   placeholder=""
-                  required={true}
                   {...register('phone')}
                 />
                 <span className="text-red-500">{errors.phone?.message}</span>
@@ -426,7 +524,7 @@ function CheckoutPage() {
               <div
                 className={`basis-1/2 flex flex-col p-4 border-2 border-gray-100 ${
                   selectedShippingMethod === 'Standard'
-                    ? 'border-3 border-primaryColor'
+                    ? 'border-3 border-goldColor'
                     : ''
                 }`}
                 onClick={() => handleShippingMethodChange('Standard')}
@@ -434,19 +532,16 @@ function CheckoutPage() {
                 <div className="flex flex-row justify-between">
                   <span className="text-lg">Standard</span>
                   {selectedShippingMethod === 'Standard' && (
-                    <GoCheckCircleFill
-                      size="20"
-                      className="text-primaryColor"
-                    />
+                    <GoCheckCircleFill size="20" className="text-goldColor" />
                   )}
                 </div>
                 <span className="text-gray-500 mb-5">10 business days</span>
-                <span className="">$5.00</span>
+                <span className="">₦5.00</span>
               </div>
               <div
                 className={`basis-1/2 flex flex-col p-4 border-2 border-gray-100 ${
                   selectedShippingMethod === 'Express'
-                    ? 'border-3 border-primaryColor'
+                    ? 'border-3 border-goldColor'
                     : ''
                 }`}
                 onClick={() => handleShippingMethodChange('Express')}
@@ -454,14 +549,11 @@ function CheckoutPage() {
                 <div className="flex flex-row justify-between">
                   <span className="text-lg">Express</span>
                   {selectedShippingMethod === 'Express' && (
-                    <GoCheckCircleFill
-                      size="20"
-                      className="text-primaryColor"
-                    />
+                    <GoCheckCircleFill size="20" className="text-goldColor" />
                   )}
                 </div>
                 <span className="text-gray-500 mb-5">2–5 business days</span>
-                <span className="">$16.00</span>
+                <span className="">₦16.00</span>
               </div>
             </div>
             <div className="mt-4 mb-2">
@@ -532,16 +624,16 @@ function CheckoutPage() {
             {couponError && <div className="text-red-500">{couponError}</div>}
             <div className="flex flex-row justify-between mt-8">
               <span>Subtotal</span>
-              <span className="font-semibold">${grandTotal}</span>
+              <span className="font-semibold">₦{grandTotal}</span>
             </div>
             <div className="flex flex-row justify-between mt-6">
               <span>Shipping</span>
-              <span className="font-semibold">+ ${shippingCost}</span>
+              <span className="font-semibold">+ ₦{shippingCost}</span>
             </div>
 
             <div className="flex flex-row justify-between mt-6">
               <span>Discount</span>
-              <span className="font-semibold">- ${discount}</span>
+              <span className="font-semibold">- ₦{discount}</span>
             </div>
             <div className="m-2 w-full mt-4">
               <hr className=" h-px bg-gray-300" />
@@ -555,8 +647,9 @@ function CheckoutPage() {
             </div>
 
             <button
+              /*  onClick={handleButtonClick} */
               type="submit"
-              className="w-full mt-8 flex flex-col p-4 text-white text-lg font-semibold rounded justify-center items-center bg-primaryColor cursor-pointer hover:bg-black"
+              className="w-full mt-8 flex flex-col p-4 text-white text-lg font-semibold rounded justify-center items-center bg-primaryColor cursor-pointer hover:bg-goldColor"
             >
               Confirm Order
             </button>

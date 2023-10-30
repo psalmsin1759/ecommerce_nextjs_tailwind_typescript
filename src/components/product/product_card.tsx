@@ -44,8 +44,8 @@ function ProductCard({ product }: ProductCardProps) {
   };
   return (
     <>
-      <div className="w-full h-250 border-2  flex flex-col items-center  relative group hover:border-primaryColor hover:border-2 m-4">
-        <div className="w-full h-200 group relative p-4">
+      <div className="h-250 border-2  flex flex-col items-center  relative group hover:border-primaryColor hover:border-2">
+        <div className="w-full h-200 group relative p-2 md:p-4">
           <Link href={`/product/${product.id}`}>
             <Image
               src={product.images[0]?.path}
@@ -56,20 +56,9 @@ function ProductCard({ product }: ProductCardProps) {
               className="w-full"
             />
           </Link>
-
-          {/*  {product.images.length > 1 && (
-            <Image
-              src={product.images[1]?.path}
-              alt={product.name}
-              width={170}
-              height={250}
-              Object-cover
-              className="w-full absolute transition-opacity duration-300 opacity-0 group-hover:opacity-100"
-            />
-          )} */}
         </div>
 
-        <div className="w-full p-4 flex flex-col items-center">
+        <div className="w-full p-4 flex flex-col items-center justify-center">
           <Rating>
             <Rating.Star />
             <Rating.Star />
@@ -79,30 +68,36 @@ function ProductCard({ product }: ProductCardProps) {
             {/* <Rating.Star filled={false} /> */}
           </Rating>
 
-          <Link href={`/product/${product.id}`}>
-            <span className="text-lg hover:text-primaryColor">
-              {product.name.toUpperCase()}
-            </span>
-          </Link>
+          <div className="w-full text-center">
+            <Link href={`/product/${product.id}`}>
+              <span className=" text-sm md:text-lg hover:text-primaryColor line-clamp-2">
+                {product.name.toUpperCase()}
+              </span>
+            </Link>
+          </div>
 
-          {product.discounted_price !== '0' ? (
-            <div className="flex flex-row gap-2 items-center">
-              <span className="text-xl font-semibold">
-                ${product.discounted_price}
+          {product.discounted_price !== 0 ? (
+            <div className="flex flex-col md:flex-row md:gap-2  items-center">
+              <span className="text-base md:text-xl font-semibold">
+                ₦{product.discounted_price}
               </span>
               <del>
                 {' '}
-                <span className="text-md text-gray-500">${product.price}</span>
+                <span className="text-base md:text-xl text-gray-500">
+                  ₦{product.price}
+                </span>
               </del>
             </div>
           ) : (
-            <span className="text-xl font-semibold">${product.price}</span>
+            <span className="text-base md:text-xl font-semibold">
+              ₦{product.price}
+            </span>
           )}
         </div>
         <div className="absolute top-64 left-0 right-0 flex flex-row gap-2 justify-center opacity-0 transition-opacity group-hover:opacity-100">
           <button
             type="button"
-            className="whiteToPrimaryColorButton pl-8 pr-8 pt-2 pb-2 shadow"
+            className="whiteToPrimaryColorButton px-4 py-2 shadow"
             onClick={handleAddToCart}
           >
             Add to cart
@@ -112,18 +107,18 @@ function ProductCard({ product }: ProductCardProps) {
             className="whiteToPrimaryColorButton p-2 shadow"
             onClick={() => handleWishlist(product.name, product.id)}
           >
-            <AiOutlineHeart size="26" />
+            <AiOutlineHeart size="24" />
           </button>
           <button
             type="button"
             className="whiteToPrimaryColorButton p-2 shadow"
             onClick={() => props.setOpenModal('default')}
           >
-            <AiOutlineSearch size="26" />
+            <AiOutlineSearch size="24" />
           </button>
         </div>
         {product.new_arrival === 1 && (
-          <div className="absolute top-4 left-4 bg-primaryColor text-white pl-2 pr-2 pt-1 pb-1 shadow">
+          <div className="absolute top-2 left-2 text-sm md:text-base md:top-4 md:left-4 bg-primaryColor text-white px-2 py-1 shadow">
             <span>New</span>
           </div>
         )}
@@ -137,10 +132,10 @@ function ProductCard({ product }: ProductCardProps) {
       >
         <Modal.Header>QuickView</Modal.Header>
         <Modal.Body>
-          <div className="space-y-3">
-            <div className="relative md:grid md:grid-cols-2  p-4 flex-auto">
+          <div className="">
+            <div className="relative md:grid md:grid-cols-2 px-1 flex-auto">
               <div className="w-full border shadow p-2">
-                <Carousel>
+                <Carousel slideInterval={3000}>
                   {product.images.map((image, index) => (
                     <Image
                       key={index}
@@ -155,7 +150,7 @@ function ProductCard({ product }: ProductCardProps) {
                 </Carousel>
               </div>
               <div className="w-full pl-4">
-                <span className="text-3xl font-semibold">{product.name}</span>
+                <span className="text-3xl font-semibold ">{product.name}</span>
                 <div className="mt-4">
                   <span className="mr-2">SKU: </span>
                   <span>{product.sku}</span>
@@ -166,7 +161,7 @@ function ProductCard({ product }: ProductCardProps) {
                 </div>
                 <hr className="mt-4 mb-4" />
                 <span className="text-2xl mt-4 mb-4 font-semibold">
-                  ${product.price}
+                  ₦{product.price}
                 </span>
                 <hr className="mt-4" />
                 <div className="flex flex-row mt-4 gap-4 items-center">

@@ -17,8 +17,8 @@ function CartModalList({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="flex flex-row justify-between mt-1 mr-4 ml-4">
-      <div className="border p-2">
+    <div className="flex flex-row justify-between items-start mt-1 mr-4 ml-4">
+      <div className="border p-2 overflow-hidden">
         <Link href={`/product/${product.id}`}>
           <Image
             src={product.images[0]?.path}
@@ -33,7 +33,7 @@ function CartModalList({ product }: ProductCardProps) {
         <div className="flex flex-row gap-2">
           <span>{product.quantity}</span>
           <span>X</span>
-          <span>{product.price}</span>
+          <span>₦{product.price}</span>
         </div>
       </div>
       <div

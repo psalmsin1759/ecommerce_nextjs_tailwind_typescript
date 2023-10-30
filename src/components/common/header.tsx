@@ -9,16 +9,22 @@ import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import CartModal from '@/components/cart/cart_modal';
 import { getAllCategories, Category } from '@/model/category';
-import { AiOutlineSearch, AiOutlineMenu } from 'react-icons/ai';
-import { CiUser } from 'react-icons/ci';
+import { AiOutlineMenu } from 'react-icons/ai';
+import { BiSearch } from 'react-icons/bi';
+import { FaSearch, FaUserAlt, FaShoppingCart } from 'react-icons/fa';
+import { FaRegUser } from 'react-icons/fa6';
 import { BsCart3 } from 'react-icons/bs';
 import { FaLongArrowAltRight } from 'react-icons/fa';
+import { Dropdown } from 'flowbite-react';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { selectTotalProductsInCart } from '@/redux/cart/cartSelector';
 
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/context/UserContext';
+
 export default function HeaderNew() {
-  const dispatch = useDispatch();
+  //const dispatch = useDispatch();
   const totalCount = useSelector(selectTotalProductsInCart);
 
   const [showCartPanel, setShowCartPanel] = useState(false);
@@ -69,12 +75,24 @@ export default function HeaderNew() {
       console.error('Failed to fetch products:', error);
     }
   };
+  const router = useRouter();
+
+  const { state } = useUser();
+
+  const { dispatch } = useUser();
+
+  const handleLogout = () => {
+    // const { dispatch } = useUser();
+    console.log('logout');
+    dispatch({ type: 'LOGOUT' });
+    router.replace('/login');
+  };
 
   return (
     <>
       <Disclosure
         as="nav"
-        className="shadow pt-2 pb-2 items-center bg-primaryColor text-white"
+        className="shadow pt-2 pb-2 items-center  text-black"
         style={{ opacity: showCartPanel ? 0.7 : 1 }}
       >
         {({ open }) => (
@@ -90,7 +108,7 @@ export default function HeaderNew() {
                       <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
                     ) : (
                       <AiOutlineMenu
-                        className="block h-6 w-6 text-white"
+                        className="block h-6 w-6 text-black"
                         aria-hidden="true"
                       />
                     )}
@@ -101,10 +119,10 @@ export default function HeaderNew() {
                     <Link href={'/'}>
                       <Image
                         className=" w-64"
-                        src="/images/try4.png"
+                        src="https://bakersluxury.com/wp-content/uploads/2019/11/header-logo.png"
                         alt="Logo"
-                        width={314}
-                        height={80}
+                        width={241}
+                        height={65}
                       />
                     </Link>
                   </div>
@@ -138,15 +156,49 @@ export default function HeaderNew() {
                     </div>
                   </div>
                 </div>
-                <div className="absolute inset-y-0 right-0 flex items-center gap-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                  {/*  <button
-                  type="button"
-                  className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                >
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button> */}
+                <div className="flex flex-row gap-2">
+                  <div className="hidden md:block">
+                    <BiSearch size="30" />
+                  </div>
+
+                  <Dropdown
+                    dismissOnClick={false}
+                    renderTrigger={() => (
+                      <span>
+                        <FaRegUser className=" cursor-pointer" size="26" />
+                      </span>
+                    )}
+                    label={'undefined'}
+                  >
+                    {state.user ? ( // Check if the user is logged in
+                      <>
+                        <Dropdown.Item>
+                          <Link href="/profile">My Account</Link>
+                        </Dropdown.Item>
+                        <Dropdown.Item>
+                          <Link href="/profile">Orders</Link>
+                        </Dropdown.Item>
+                        <Dropdown.Item>
+                          <Link href="/profile">Wishlist</Link>
+                        </Dropdown.Item>
+                        <Dropdown.Item>
+                          <button type="button" onClick={handleLogout}>
+                            Logout
+                          </button>
+                        </Dropdown.Item>
+                      </>
+                    ) : (
+                      <>
+                        <Dropdown.Item>
+                          <Link href="/login">Register</Link>
+                        </Dropdown.Item>
+                        <Dropdown.Item>
+                          <Link href="/login">Login</Link>
+                        </Dropdown.Item>
+                      </>
+                    )}
+                  </Dropdown>
+
                   <div className="relative">
                     <button
                       type="button"
@@ -158,16 +210,6 @@ export default function HeaderNew() {
                     <div className="absolute top-0 right-0 -mt-3   rounded-full bg-red-500 p-1 text-white  w-6 h-6 flex items-center justify-center">
                       <span>{totalCount}</span>
                     </div>
-                  </div>
-                </div>
-                <div className="flex">
-                  <div className="hidden xl:flex space-x-5 items-center">
-                    <a className="hover:text-gray-200" href="#">
-                      <AiOutlineSearch size="26" />
-                    </a>
-                    <a className="hover:text-gray-200" href="#">
-                      <CiUser size="26" />
-                    </a>
                   </div>
                 </div>
               </div>

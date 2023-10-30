@@ -17,17 +17,22 @@ function BannerCard(_props: any) {
         className="w-full h-full object-cover transition duration-300 ease-in-out hover:scale-110"
       />
 
-      <div className="absolute top-10 left-8 w-1/2">
-        <span className="text-xl  text-black-500 break-words block">
-          {_props.title}
-        </span>
-        <span className="text-2xl font-semibold text-black-500 break-words block mt-2">
-          {_props.subTitle}
-        </span>
+      <div className="absolute top-8 md:top-10 left-8 w-1/2">
+        <div className="flex flex-col gap-1">
+          <span className="text-base md:text-xl  text-black-500 break-words block">
+            {_props.title}
+          </span>
+          <span className="text-base md:text-2xl font-semibold text-black-500 break-words block line-clamp-2 ">
+            {_props.subTitle}
+          </span>
 
-        <button type="button" className="primaryColorButton mt-6">
-          Shop Now
-        </button>
+          <button
+            type="button"
+            className="rounded w-32 md:w-44 bg-primaryColor text-white px-4 py-2  md:mt-6 hover:bg-goldColor"
+          >
+            Shop Now
+          </button>
+        </div>
       </div>
     </motion.div>
   );

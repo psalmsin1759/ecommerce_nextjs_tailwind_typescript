@@ -10,6 +10,9 @@ import { Carousel } from 'flowbite-react';
 import Link from 'next/link';
 import { Alert } from 'flowbite-react';
 
+import { useSelector, useDispatch } from 'react-redux';
+import { addToCart } from '@/redux/cart/cartSelector';
+
 interface ProductCardProps {
   product: RelatedProduct;
 }
@@ -34,10 +37,15 @@ function RelatedProductCard({ product }: ProductCardProps) {
   function handleWishlist(productName: string, productId: number) {
     alert(productName + ' add to wishlist');
   }
+
+  const dispatch = useDispatch();
+  /*  const handleAddToCart = () => {
+    dispatch(addToCart(product, quantity, ''));
+  }; */
   return (
     <>
-      <div className="w-full h-250 border-2  flex flex-col items-center  relative group hover:border-primaryColor hover:border-2 m-4">
-        <div className="w-full h-200 group relative">
+      <div className="h-250 border-2  flex flex-col items-center  relative group hover:border-primaryColor hover:border-2">
+        <div className="w-full h-200 group relative p-2 md:p-4">
           <Link href={`/product/${product.id}`}>
             <Image
               src={product.images[0]?.path}
@@ -70,25 +78,34 @@ function RelatedProductCard({ product }: ProductCardProps) {
             <Rating.Star />
             {/* <Rating.Star filled={false} /> */}
           </Rating>
-          <span className="text-lg">{product.name}</span>
+          <div className="w-full text-center">
+            <Link href={`/product/${product.id}`}>
+              <span className=" text-sm md:text-lg hover:text-primaryColor line-clamp-2">
+                {product.name.toUpperCase()}
+              </span>
+            </Link>
+          </div>
           {product.discounted_price !== '0' ? (
-            <div className="flex flex-row gap-2 items-center">
-              <span className="text-xl font-semibold">
-                ${product.discounted_price}
+            <div className="flex flex-col md:flex-row md:gap-2  items-center">
+              <span className="text-base md:text-xl font-semibold">
+                ₦{product.discounted_price}
               </span>
               <del>
                 {' '}
-                <span className="text-md text-gray-500">${product.price}</span>
+                <span className="text-base md:text-xl text-gray-500">
+                  ₦{product.price}
+                </span>
               </del>
             </div>
           ) : (
             <span className="text-xl font-semibold">${product.price}</span>
           )}
         </div>
-        <div className="absolute top-64 left-0 right-0 flex flex-row gap-2 justify-center opacity-0 transition-opacity group-hover:opacity-100">
+        {/*  <div className="absolute top-64 left-0 right-0 flex flex-row gap-2 justify-center opacity-0 transition-opacity group-hover:opacity-100">
           <button
             type="button"
-            className="whiteToPrimaryColorButton pl-8 pr-8 pt-2 pb-2 shadow"
+            className="whiteToPrimaryColorButton px-4 py-2 shadow"
+            onClick={handleAddToCart}
           >
             Add to cart
           </button>
@@ -97,18 +114,18 @@ function RelatedProductCard({ product }: ProductCardProps) {
             className="whiteToPrimaryColorButton p-2 shadow"
             onClick={() => handleWishlist(product.name, product.id)}
           >
-            <AiOutlineHeart size="26" />
+            <AiOutlineHeart size="24" />
           </button>
           <button
             type="button"
             className="whiteToPrimaryColorButton p-2 shadow"
             onClick={() => props.setOpenModal('default')}
           >
-            <AiOutlineSearch size="26" />
+            <AiOutlineSearch size="24" />
           </button>
-        </div>
+        </div> */}
         {product.new_arrival === 1 && (
-          <div className="absolute top-2 left-2 bg-primaryColor text-white pl-2 pr-2 pt-1 pb-1 shadow">
+          <div className="absolute top-2 left-2 text-sm md:text-base md:top-4 md:left-4 bg-primaryColor text-white px-2 py-1 shadow">
             <span>New</span>
           </div>
         )}
@@ -151,7 +168,7 @@ function RelatedProductCard({ product }: ProductCardProps) {
                 </div>
                 <hr className="mt-4 mb-4" />
                 <span className="text-2xl mt-4 mb-4 font-semibold">
-                  ${product.price}
+                  ₦{product.price}
                 </span>
                 <hr className="mt-4" />
                 <div className="flex flex-row mt-4 gap-4 items-center">

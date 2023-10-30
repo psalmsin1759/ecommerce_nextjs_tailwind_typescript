@@ -22,7 +22,7 @@ function FeaturedProducts() {
   return (
     <div className="flex flex-col justify-center items-center mt-6">
       <h1 className="text-4xl">Featured Products</h1>
-      <div className="w-full m-4 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2">
+      <div className="m-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
         {products?.map((product: Product) => (
           <ProductCard key={product.id} product={product} />
         ))}

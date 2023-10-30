@@ -162,9 +162,9 @@ function ProductPage({ params }: { params: { id: number } }) {
         </Breadcrumb>
       </div>
       <div className="w-screen flex flex-col">
-        <div className="w-screen flex flex-col md:flex-row p-4 gap-1">
-          <div className="w-screen  flex flex-col-reverse md:flex-row gap-4">
-            <div className=" flex flex-row w-full md:w-28 md:flex-col gap-2 ">
+        <div className=" flex flex-col md:flex-row p-4 gap-1">
+          <div className="w-full flex flex-col-reverse md:flex-row gap-4">
+            <div className=" flex flex-row  md:w-28 md:flex-col gap-2 ">
               {product?.images
                 ?.slice(0, 4) // Use slice to get the first 4 images
                 .map((image: Image) => (
@@ -240,7 +240,7 @@ function ProductPage({ params }: { params: { id: number } }) {
             </div>
             <div className="mt-6">
               <span className=" text-4xl font-semibold  text-primaryColor">
-                ${product?.price}
+                ₦{product?.price}
               </span>
             </div>
             <div className="mt-4">
@@ -336,7 +336,7 @@ function ProductPage({ params }: { params: { id: number } }) {
             <button
               type="button"
               onClick={() => handleAddToCart(product!, quantity)}
-              className="flex flex-row gap-2 hover:bg-primaryColor bg-black p-2 w-56 mt-4 justify-center items-center rounded-full cursor-pointer"
+              className="flex flex-row gap-2 hover:bg-goldColor bg-black p-2 w-56 mt-4 justify-center items-center rounded-full cursor-pointer"
             >
               <svg
                 className="w-6 text-white"
@@ -441,7 +441,7 @@ function ProductPage({ params }: { params: { id: number } }) {
         <span>Related Products</span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 m-2">
         {relatedProducts?.map((product: RelatedProduct) => (
           <RelatedProductCard product={product} />
         ))}
