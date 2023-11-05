@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import imageBasePath from '@/components/common/path';
 
 function BannerCard(_props: any) {
   // Determine the animation class based on the item's index
@@ -9,7 +10,7 @@ function BannerCard(_props: any) {
   return (
     <motion.div className="bg-gray-200 h-300 rounded-lg overflow-hidden shadow-lg relative w-full">
       <Image
-        src={_props.imagePath}
+        src={imageBasePath + 'banner/' + _props.imagePath}
         alt=".."
         width={0}
         height={300}
@@ -28,7 +29,7 @@ function BannerCard(_props: any) {
 
           <button
             type="button"
-            className="rounded w-32 md:w-44 bg-primaryColor text-white px-4 py-2  md:mt-6 hover:bg-goldColor"
+            className="rounded w-32 md:w-44 bg-goldColor text-white px-4 py-2  md:mt-6 hover:bg-primaryColor"
           >
             Shop Now
           </button>

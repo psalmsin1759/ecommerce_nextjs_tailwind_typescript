@@ -10,6 +10,7 @@ import CartCheckoutList from '@/components/cart/cart_checkout_list';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from '@/api/axios';
 import qs from 'qs';
+import { clearCart } from '@/redux/cart/cartSlice';
 import {
   selectCartItems,
   selectTotalGrandPrice,
@@ -20,6 +21,7 @@ import * as Yup from 'yup';
 import { Coupon, applyCoupon } from '@/model/coupon';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useUser } from '@/context/UserContext';
+import { Button } from 'flowbite-react';
 
 import { loadStripe, Stripe } from '@stripe/stripe-js';
 import {
@@ -47,6 +49,7 @@ interface IFormInput {
   postalCode: string;
   country: string;
   phone: string;
+  password: string;
 }
 
 //const stripePromise = loadStripe(process.env.STRIPE_PUBLISHABLE_KEY);
@@ -75,6 +78,8 @@ const CARD_OPTIONS = {
 };
 
 function CheckoutPage() {
+  const [isLoading, setIsLoading] = useState(false);
+
   const [apiKey, setAPIKey] = useState(
     'AIzaSyCfA2rPPQFxQzT4f__r9DIU3_k9-Z8K-68'
   );
@@ -145,8 +150,8 @@ function CheckoutPage() {
 
   // Define the shipping cost for each method
   const shippingCosts = {
-    Standard: 1000,
-    Express: 2000,
+    Standard: 5,
+    Express: 16,
   };
 
   // Calculate the shipping cost based on the selected method
@@ -213,6 +218,7 @@ function CheckoutPage() {
     postalCode: Yup.string().required('Postal Code is required'),
     phone: Yup.string().required('Phone is required'),
     country: Yup.string().required('Country is required'),
+    password: Yup.string().notRequired(),
   });
 
   const {
@@ -232,14 +238,14 @@ function CheckoutPage() {
 
   const loadUserData = () => {
     if (state.user) {
-      /* reset({
+      reset({
         firstName: state.user.firstName,
         lastName: state.user.lastName,
         email: state.user.email,
         city: state.user.city,
         state: state.user.state,
         postalCode: state.user.postalCode,
-      }); */
+      });
     }
   };
 
@@ -257,7 +263,10 @@ function CheckoutPage() {
     [searchParams]
   );
 
+  const [createAccount, setCreateAccount] = useState(false);
+
   const onSubmit = async (data: IFormInput) => {
+    setIsLoading(true);
     console.log('hello');
     console.log('Form data:', data);
     console.log(selectedAddress);
@@ -266,10 +275,25 @@ function CheckoutPage() {
     // console.log('shipping cost: ' + shippingCost);
     //console.log('selected country: ' + selectedCountry);
 
+    const cartData = cartItems.map((item) => {
+      return {
+        product_id: item.id,
+        quantity: item.quantity,
+        options: item.option || '',
+      };
+    });
+
     const min = 1000000; // Smallest 7-digit number
     const max = 9999999; // Largest 7-digit number
 
     const randomOrderId = Math.floor(Math.random() * (max - min + 1)) + min;
+
+    let newUser = 'false';
+    if (createAccount) {
+      newUser = 'true';
+    } else {
+      newUser = 'false';
+    }
 
     const input = {
       orderid: randomOrderId,
@@ -289,7 +313,9 @@ function CheckoutPage() {
       shipping_city: data.city,
       shipping_state: data.state,
       shipping_country: selectedCountry,
-      cart_items: '',
+      cart_items: cartData,
+      create_account: newUser,
+      password: data.password,
     };
 
     const URL = '/placeOrder';
@@ -298,9 +324,10 @@ function CheckoutPage() {
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
     });
 
-    console.log(response);
+    // console.log(response);
 
     if (response?.data.success) {
+      setIsLoading(false);
       const total = response.data.total;
       const orderID = response.data.orderid;
       const purchaseDate = response.data.purchasedate;
@@ -316,6 +343,8 @@ function CheckoutPage() {
           '&' +
           createQueryString('purchasedate', purchaseDate)
       );
+
+      dispatch(clearCart());
     } else {
       const message = response.data.message;
       alert(message);
@@ -516,6 +545,43 @@ function CheckoutPage() {
                 <span className="text-red-500">{errors.phone?.message}</span>
               </div>
             </div>
+            {state.user === null && (
+              <div className=" md:flex md:flex-row md:gap-4 mt-4">
+                <div className="w-full basis-1/2 flex flex-row gap-2">
+                  <input
+                    type="checkbox"
+                    id="createAccount"
+                    className=" text-primaryColor"
+                    checked={createAccount}
+                    onChange={(e) => setCreateAccount(e.target.checked)}
+                  />
+                  <label className=" mr-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Create New Account
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {createAccount && state.user === null ? (
+              <div className=" md:flex md:flex-row md:gap-4 mt-4">
+                <div className="w-full basis-1/2">
+                  <div className="mb-6">
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      id="password"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
+                      placeholder=""
+                      {...register('password')}
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div></div>
+            )}
             <div className="mt-4 mb-2">
               <hr />
             </div>
@@ -524,7 +590,7 @@ function CheckoutPage() {
               <div
                 className={`basis-1/2 flex flex-col p-4 border-2 border-gray-100 ${
                   selectedShippingMethod === 'Standard'
-                    ? 'border-3 border-goldColor'
+                    ? 'border-3 border-primaryColor'
                     : ''
                 }`}
                 onClick={() => handleShippingMethodChange('Standard')}
@@ -532,16 +598,19 @@ function CheckoutPage() {
                 <div className="flex flex-row justify-between">
                   <span className="text-lg">Standard</span>
                   {selectedShippingMethod === 'Standard' && (
-                    <GoCheckCircleFill size="20" className="text-goldColor" />
+                    <GoCheckCircleFill
+                      size="20"
+                      className="text-primaryColor"
+                    />
                   )}
                 </div>
                 <span className="text-gray-500 mb-5">10 business days</span>
-                <span className="">₦5.00</span>
+                <span className="">£‌5.00</span>
               </div>
               <div
                 className={`basis-1/2 flex flex-col p-4 border-2 border-gray-100 ${
                   selectedShippingMethod === 'Express'
-                    ? 'border-3 border-goldColor'
+                    ? 'border-3 border-primaryColor'
                     : ''
                 }`}
                 onClick={() => handleShippingMethodChange('Express')}
@@ -549,11 +618,14 @@ function CheckoutPage() {
                 <div className="flex flex-row justify-between">
                   <span className="text-lg">Express</span>
                   {selectedShippingMethod === 'Express' && (
-                    <GoCheckCircleFill size="20" className="text-goldColor" />
+                    <GoCheckCircleFill
+                      size="20"
+                      className="text-primaryColor"
+                    />
                   )}
                 </div>
                 <span className="text-gray-500 mb-5">2–5 business days</span>
-                <span className="">₦16.00</span>
+                <span className="">£‌16.00</span>
               </div>
             </div>
             <div className="mt-4 mb-2">
@@ -624,35 +696,38 @@ function CheckoutPage() {
             {couponError && <div className="text-red-500">{couponError}</div>}
             <div className="flex flex-row justify-between mt-8">
               <span>Subtotal</span>
-              <span className="font-semibold">₦{grandTotal}</span>
+              <span className="font-semibold">£‌{grandTotal}</span>
             </div>
             <div className="flex flex-row justify-between mt-6">
               <span>Shipping</span>
-              <span className="font-semibold">+ ₦{shippingCost}</span>
+              <span className="font-semibold">+ £‌{shippingCost}</span>
             </div>
 
             <div className="flex flex-row justify-between mt-6">
               <span>Discount</span>
-              <span className="font-semibold">- ₦{discount}</span>
+              <span className="font-semibold">- £‌{discount}</span>
             </div>
             <div className="m-2 w-full mt-4">
               <hr className=" h-px bg-gray-300" />
             </div>
             <div className="flex flex-row justify-between mt-4">
               <span>Total</span>
-              <span className="font-semibold text-xl">${total.toFixed(2)}</span>
+              <span className="font-semibold text-xl">
+                £‌{total.toFixed(2)}
+              </span>
             </div>
             <div className="m-2 w-full mt-4">
               <hr className=" h-px bg-gray-300" />
             </div>
 
-            <button
+            <Button
               /*  onClick={handleButtonClick} */
+              isProcessing={isLoading}
               type="submit"
               className="w-full mt-8 flex flex-col p-4 text-white text-lg font-semibold rounded justify-center items-center bg-primaryColor cursor-pointer hover:bg-goldColor"
             >
               Confirm Order
-            </button>
+            </Button>
           </div>
         </div>
       </form>

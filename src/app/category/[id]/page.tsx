@@ -78,7 +78,7 @@ function CategoryMainPage({ params }: { params: { id: number } }) {
           <Breadcrumb.Item>{categoryName}</Breadcrumb.Item>
         </Breadcrumb>
       </div>
-      <div className="flex flex-col-reverse md:flex-row m-4  ">
+      <div className="min-h-screen flex flex-col-reverse md:flex-row m-4  ">
         <div className="basis-1/5 md:mr-2">
           <SideCategory />
           <div className="flex flex-col mt-2">

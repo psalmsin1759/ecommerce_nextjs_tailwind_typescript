@@ -12,6 +12,7 @@ import { Alert } from 'flowbite-react';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { addToCart } from '@/redux/cart/cartSelector';
+import imageBasePath from '@/components/common/path';
 
 interface ProductCardProps {
   product: RelatedProduct;
@@ -48,7 +49,7 @@ function RelatedProductCard({ product }: ProductCardProps) {
         <div className="w-full h-200 group relative p-2 md:p-4">
           <Link href={`/product/${product.id}`}>
             <Image
-              src={product.images[0]?.path}
+              src={imageBasePath + 'product/' + product.images[0]?.path}
               alt={product.name}
               width={170}
               height={250}
@@ -85,20 +86,20 @@ function RelatedProductCard({ product }: ProductCardProps) {
               </span>
             </Link>
           </div>
-          {product.discounted_price !== '0' ? (
+          {product.discounted_price > '0' ? (
             <div className="flex flex-col md:flex-row md:gap-2  items-center">
               <span className="text-base md:text-xl font-semibold">
-                ₦{product.discounted_price}
+                £{product.discounted_price}
               </span>
               <del>
                 {' '}
                 <span className="text-base md:text-xl text-gray-500">
-                  ₦{product.price}
+                  £{product.price}
                 </span>
               </del>
             </div>
           ) : (
-            <span className="text-xl font-semibold">${product.price}</span>
+            <span className="text-xl font-semibold">£{product.price}</span>
           )}
         </div>
         {/*  <div className="absolute top-64 left-0 right-0 flex flex-row gap-2 justify-center opacity-0 transition-opacity group-hover:opacity-100">
@@ -146,7 +147,7 @@ function RelatedProductCard({ product }: ProductCardProps) {
                   {product.images.map((image, index) => (
                     <Image
                       key={index}
-                      src={image.path}
+                      src={imageBasePath + 'product/' + image.path}
                       alt={product.name}
                       width={170}
                       height={250}
@@ -168,7 +169,7 @@ function RelatedProductCard({ product }: ProductCardProps) {
                 </div>
                 <hr className="mt-4 mb-4" />
                 <span className="text-2xl mt-4 mb-4 font-semibold">
-                  ₦{product.price}
+                  £‌{product.price}
                 </span>
                 <hr className="mt-4" />
                 <div className="flex flex-row mt-4 gap-4 items-center">

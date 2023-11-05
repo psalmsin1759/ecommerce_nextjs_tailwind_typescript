@@ -22,7 +22,7 @@ function CartModal() {
       <hr className="mt-4 ml-4 mr-4" />
       <div className="flex flex-row justify-between mt-2 ml-4 mr-4">
         <span className="text-md">Subtotal</span>
-        <span className="text-xl font-semibold">₦{grandTotal}</span>
+        <span className="text-xl font-semibold">£‌{grandTotal}</span>
       </div>
       <hr className="m-2" />
       <div className="flex flex-col items-center gap-2 mt-2">

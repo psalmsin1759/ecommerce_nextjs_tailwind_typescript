@@ -8,6 +8,7 @@ import {
 } from '@/redux/cart/cartSlice';
 import { selectSubtotalForProduct } from '@/redux/cart/cartSelector';
 import { useSelector, useDispatch } from 'react-redux';
+import imageBasePath from '@/components/common/path';
 
 interface ProductCardProps {
   product: Product;
@@ -58,7 +59,7 @@ function CartList2({ product }: ProductCardProps) {
               <div className="w-20 h-28">
                 <Image
                   className="w-20 h-28"
-                  src={product.images[0]?.path}
+                  src={imageBasePath + 'product/' + product.images[0]?.path}
                   alt="Logo"
                   width={80}
                   height={106}
@@ -115,7 +116,7 @@ function CartList2({ product }: ProductCardProps) {
         </div>
         <div className="hidden md:block p-6 text-center">
           {' '}
-          <span className="text-red-500">₦{product.price}</span>
+          <span className="text-red-500">£‌{product.price}</span>
         </div>
         <div className="hidden md:block p-6 text-center ">
           <div className="rounded-full w-32 pl-4 pr-4 pt-2 pb-2 border-2 flex flex-row items-center justify-between gap-2">
@@ -157,7 +158,7 @@ function CartList2({ product }: ProductCardProps) {
           </div>
         </div>
         <div className="hidden md:block p-6 text-center">
-          <span className="text-red-500">₦{subtotal}</span>
+          <span className="text-red-500">£‌{subtotal}</span>
         </div>
       </div>
     </div>

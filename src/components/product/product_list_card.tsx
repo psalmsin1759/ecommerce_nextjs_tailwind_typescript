@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { Alert } from 'flowbite-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { addToCart } from '@/redux/cart/cartSelector';
+import imageBasePath from '@/components/common/path';
 
 interface ProductCardProps {
   product: Product;
@@ -48,7 +49,7 @@ function ProductListCard({ product }: ProductCardProps) {
         <div className=" h-200 group relative p-4">
           <Link href={`/product/${product.id}`}>
             <Image
-              src={product.images[0]?.path}
+              src={imageBasePath + 'product/' + product.images[0]?.path}
               alt={product.name}
               width={170}
               height={250}
@@ -71,22 +72,24 @@ function ProductListCard({ product }: ProductCardProps) {
               {product.name.toUpperCase()}
             </span>
           </Link>
-          <span className="text-md text-gray-300 line-clamp-2 ">
-            {product.description}
-          </span>
 
-          {product.discounted_price !== 0 ? (
+          <span
+            className="text-md text-gray-300 line-clamp-2 "
+            dangerouslySetInnerHTML={{ __html: product?.description ?? '' }}
+          ></span>
+
+          {product.discounted_price > 0 ? (
             <div className="flex flex-row gap-2 items-center">
               <span className="text-xl font-semibold">
-                ₦{product.discounted_price}
+                £{product.discounted_price}
               </span>
               <del>
                 {' '}
-                <span className="text-md text-gray-500">₦{product.price}</span>
+                <span className="text-md text-gray-500">£{product.price}</span>
               </del>
             </div>
           ) : (
-            <span className="text-xl font-semibold">₦{product.price}</span>
+            <span className="text-xl font-semibold">£{product.price}</span>
           )}
 
           <div className="flex flex-row gap-2 justify-center">
@@ -129,7 +132,7 @@ function ProductListCard({ product }: ProductCardProps) {
                   {product.images.map((image, index) => (
                     <Image
                       key={index}
-                      src={image.path}
+                      src={imageBasePath + 'product/' + image.path}
                       alt={product.name}
                       width={170}
                       height={250}
@@ -151,7 +154,7 @@ function ProductListCard({ product }: ProductCardProps) {
                 </div>
                 <hr className="mt-4 mb-4" />
                 <span className="text-2xl mt-4 mb-4 font-semibold">
-                  ₦{product.price}
+                  £‌{product.price}
                 </span>
                 <hr className="mt-4" />
                 <div className="flex flex-row mt-4 gap-4 items-center">

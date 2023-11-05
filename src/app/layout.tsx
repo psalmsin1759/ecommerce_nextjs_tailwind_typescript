@@ -7,8 +7,8 @@ const inter = Inter({ subsets: ['latin'] });
 const jost = Jost({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Bakers Luxury',
-  description: 'Bakers Luxury',
+  title: 'Eppagelia',
+  description: 'Eppagelia',
 };
 
 export default function RootLayout({

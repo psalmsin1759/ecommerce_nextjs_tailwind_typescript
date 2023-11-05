@@ -4,8 +4,58 @@ import { FaCcVisa, FaCcMastercard, FaCcPaypal } from 'react-icons/fa';
 import { FaCcStripe } from 'react-icons/fa6';
 import Link from 'next/link';
 import { getAllCategories, Category } from '@/model/category';
+import { getStoreData, Store } from '@/model/store';
+import { useUser } from '@/context/UserContext';
 
 function Footer() {
+  const [store, setStore] = useState<Store>({
+    id: 0,
+    name: '',
+    address: '',
+    state: '',
+    country: '',
+    geocode_latitude: '',
+    geocode_longitude: '',
+    email: '',
+    phone: '',
+    opening_times: '',
+    aboutus: '',
+    mission: '',
+    vision: '',
+    terms: '',
+    privacy_policy: '',
+    return_policy: '',
+    refund_policy: '',
+    favicon_path: '',
+    logo_path: '',
+    footer_logo_path: '',
+    meta_title: '',
+    meta_description: '',
+    meta_tag_keywords: '',
+    instagram_link: '',
+    facebook_link: '',
+    twitter_link: '',
+    tiktok_link: '',
+    payment_pub_key: '',
+    payment_secret_key: '',
+    created_at: '',
+    updated_at: '',
+  });
+
+  useEffect(() => {
+    loadStoreData();
+  }, []);
+
+  const loadStoreData = async () => {
+    try {
+      const data = await getStoreData();
+
+      setStore(data);
+    } catch (error) {
+      console.error('Failed to fetch store:', error);
+    }
+  };
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Category[]>([]);
 
@@ -29,6 +79,8 @@ function Footer() {
     }
   };
 
+  const { state } = useUser();
+
   return (
     <footer className="w-full bg-footerColor border-t border-gray-300 mt-8 text-white">
       <div className="w-screen flex flex-col p-4  md:p-20 gap-4">
@@ -37,7 +89,7 @@ function Footer() {
             <div className="text-teal-600">
               <Image
                 className=""
-                src="https://via.placeholder.com/237x80"
+                src="/images/logo2.png"
                 alt="Logo"
                 width={237}
                 height={80}
@@ -52,7 +104,7 @@ function Footer() {
             <ul className="mt-8 flex gap-6">
               <li>
                 <a
-                  href="/"
+                  href={store?.facebook_link}
                   rel="noreferrer"
                   target="_blank"
                   className="text-gray-700 transition hover:opacity-75"
@@ -76,7 +128,7 @@ function Footer() {
 
               <li>
                 <a
-                  href="/"
+                  href={store?.instagram_link}
                   rel="noreferrer"
                   target="_blank"
                   className="text-gray-700 transition hover:opacity-75"
@@ -100,7 +152,7 @@ function Footer() {
 
               <li>
                 <a
-                  href="/"
+                  href={store?.twitter_link}
                   rel="noreferrer"
                   target="_blank"
                   className="text-gray-700 transition hover:opacity-75"
@@ -124,13 +176,13 @@ function Footer() {
             <div>
               <p className="font-medium ">Categories</p>
 
-              <ul className="mt-6 space-y-4 text-sm">
+              <ul className="mt-6 space-y-4 text-sm text-footerTextColor">
                 {categories?.map((category: Category) => (
                   <li>
                     <Link
                       key={category.id}
                       href={`/category/${category.id}`}
-                      className="text-footerTextColortransition hover:opacity-75"
+                      className="text-footerTextColor transition hover:opacity-75"
                     >
                       {category.name}
                     </Link>
@@ -145,7 +197,7 @@ function Footer() {
               <ul className="mt-6 space-y-4 text-sm">
                 <li>
                   <Link
-                    href="/profile"
+                    href={state.user ? '/profile' : '/login'}
                     className="text-footerTextColor transition hover:opacity-75"
                   >
                     My Account
@@ -154,7 +206,7 @@ function Footer() {
 
                 <li>
                   <Link
-                    href="/profile"
+                    href={state.user ? '/profile' : '/login'}
                     className="text-footerTextColor transition hover:opacity-75"
                   >
                     Order History
@@ -163,7 +215,7 @@ function Footer() {
 
                 <li>
                   <Link
-                    href="/profile"
+                    href={state.user ? '/profile' : '/login'}
                     className="text-footerTextColor transition hover:opacity-75"
                   >
                     Wish List
@@ -245,7 +297,7 @@ function Footer() {
 
         <div className="flex flex-col gap-2 md:flex-row md:justify-between">
           <p className="text-xs text-gray-500">
-            &copy; 2023 Bakersluxury. All rights reserved.
+            &copy; 2023 Eppagelia. All rights reserved.
           </p>
           <div className="flex flex-row gap-2">
             <FaCcVisa size="32" />

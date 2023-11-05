@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Product } from '@/model/Product';
 import { removeFromCart } from '@/redux/cart/cartSlice';
 import { useDispatch } from 'react-redux';
+import imageBasePath from '@/components/common/path';
 
 interface ProductCardProps {
   product: Product;
@@ -21,7 +22,7 @@ function CartModalList({ product }: ProductCardProps) {
       <div className="border p-2 overflow-hidden">
         <Link href={`/product/${product.id}`}>
           <Image
-            src={product.images[0]?.path}
+            src={imageBasePath + 'product/' + product.images[0]?.path}
             alt={product.name}
             width={80}
             height={106}
@@ -33,7 +34,7 @@ function CartModalList({ product }: ProductCardProps) {
         <div className="flex flex-row gap-2">
           <span>{product.quantity}</span>
           <span>X</span>
-          <span>₦{product.price}</span>
+          <span>£‌{product.price}</span>
         </div>
       </div>
       <div

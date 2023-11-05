@@ -4,6 +4,7 @@ import { Carousel } from 'flowbite-react';
 import Image from 'next/image';
 import { getAllSliders, Slider } from '@/model/slider';
 import { motion } from 'framer-motion';
+import imageBasePath from '@/components/common/path';
 
 function Slider() {
   const [sliders, setSliders] = useState<Slider[]>([]);
@@ -28,13 +29,13 @@ function Slider() {
   };
 
   return (
-    <div className="h-400 w-full ">
+    <div className="min-h-400 h-400 w-full ">
       <Carousel slideInterval={3000}>
         {sliders?.map((slider: Slider) => (
           <div className="relative ">
             <Image
               alt="..."
-              src={slider.image_path}
+              src={imageBasePath + 'slider/' + slider.image_path}
               width={1960}
               height={400}
               sizes="100vw"

@@ -7,6 +7,8 @@ import UpdateProfile from './update_profile';
 import WishListPage from './wishlist_page';
 import OrderListPage from './orderlist_page';
 import ChangePassword from './change_password';
+import { useUser } from '@/context/UserContext';
+import { useRouter } from 'next/navigation';
 
 export default function MyProfile() {
   const profileMenus: ProfileMenu[] = [
@@ -17,8 +19,16 @@ export default function MyProfile() {
     { text: 'Logout', icon: <FaSignOutAlt /> },
   ];
 
+  const router = useRouter();
+  const { dispatch } = useUser();
+
   const [selectedMenuItem, setSelectedMenuItem] =
     useState<string>('My Profile');
+
+  const handleLogout = () => {
+    dispatch({ type: 'LOGOUT' });
+    router.replace('/');
+  };
 
   const renderSelectedComponent = () => {
     switch (selectedMenuItem) {
@@ -30,18 +40,26 @@ export default function MyProfile() {
         return <OrderListPage />;
       case 'Change Password':
         return <ChangePassword />;
+      case 'Logout':
+        // Call the handleLogout function when "Logout" is selected
+        handleLogout();
+        return null;
       default:
         return null;
     }
   };
+
+  const { state } = useUser();
 
   return (
     <div className="flex flex-col md:flex-row m-8 gap-4 ">
       <div className="w-full flex flex-col justify-center items-center p-8 border shadow md:basis-1/4 ">
         <Image src={'/images/user1.png'} alt="" width={100} height={100} />
 
-        <span className="text-xl mt-4">Your Name</span>
-        <span className="text-sm">Your Email</span>
+        <span className="text-xl mt-4">
+          {state.user?.firstName} {state.user?.lastName}
+        </span>
+        <span className="text-sm">{state.user?.email}</span>
 
         {profileMenus.map((item, index) => (
           <MenuComponent

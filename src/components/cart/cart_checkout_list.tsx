@@ -3,6 +3,7 @@ import { Product } from '@/model/Product';
 import { removeFromCart } from '@/redux/cart/cartSlice';
 import { useDispatch } from 'react-redux';
 import Image from 'next/image';
+import imageBasePath from '@/components/common/path';
 
 interface ProductCardProps {
   product: Product;
@@ -20,7 +21,7 @@ function CartCheckoutList({ product }: ProductCardProps) {
       <div className="flex flex-row">
         <div className="bg-white p-2">
           <Image
-            src={product.images[0]?.path}
+            src={imageBasePath + 'product/' + product.images[0]?.path}
             alt={product.name}
             width={90}
             height={116}

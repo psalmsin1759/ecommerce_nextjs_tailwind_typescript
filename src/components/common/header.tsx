@@ -92,7 +92,7 @@ export default function HeaderNew() {
     <>
       <Disclosure
         as="nav"
-        className="shadow pt-2 pb-2 items-center  text-black"
+        className="shadow pt-2 pb-2 items-center  text-hw"
         style={{ opacity: showCartPanel ? 0.7 : 1 }}
       >
         {({ open }) => (
@@ -101,7 +101,7 @@ export default function HeaderNew() {
               <div className="relative flex h-16 items-center justify-between">
                 <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                   {/* Mobile menu button*/}
-                  <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-primaryColor hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                  <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-primaryColor hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-black">
                     <span className="absolute -inset-0.5" />
                     <span className="sr-only">Open main menu</span>
                     {open ? (
@@ -119,10 +119,10 @@ export default function HeaderNew() {
                     <Link href={'/'}>
                       <Image
                         className=" w-64"
-                        src="https://bakersluxury.com/wp-content/uploads/2019/11/header-logo.png"
+                        src="/images/try4.png"
                         alt="Logo"
-                        width={241}
-                        height={65}
+                        width={300}
+                        height={60}
                       />
                     </Link>
                   </div>
@@ -252,7 +252,7 @@ export default function HeaderNew() {
 
       <div
         ref={panelRef}
-        className={`fixed inset-y-0 right-0 w-72 md:w-96 bg-white h-full transform transition-transform ${
+        className={`fixed text-black inset-y-0 right-0 w-72 md:w-96 bg-white h-full transform transition-transform ${
           showCartPanel ? 'translate-x-0' : 'translate-x-full'
         } shadow-lg overflow-y-auto`}
       >

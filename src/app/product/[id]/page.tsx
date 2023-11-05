@@ -22,8 +22,12 @@ import {
 } from 'react-icons/bi';
 import { useSelector, useDispatch } from 'react-redux';
 import { addToCart } from '@/redux/cart/cartSelector';
+import imageBasePath from '@/components/common/path';
+import { Modal } from 'flowbite-react';
 
 function ProductPage({ params }: { params: { id: number } }) {
+  const [openModal, setOpenModal] = useState(false);
+
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
 
@@ -174,7 +178,7 @@ function ProductPage({ params }: { params: { id: number } }) {
                     onClick={() => handleImageClick(image.path)}
                   >
                     <Images
-                      src={image.path}
+                      src={imageBasePath + 'product/' + image.path}
                       alt="..."
                       width={70}
                       height={95}
@@ -187,7 +191,7 @@ function ProductPage({ params }: { params: { id: number } }) {
             <div className="grow border shadow p-8">
               {product && product.images && product.images.length > 0 ? (
                 <Images
-                  src={selectedImage}
+                  src={imageBasePath + 'product/' + selectedImage}
                   alt="..."
                   width={170}
                   height={250}
@@ -240,7 +244,7 @@ function ProductPage({ params }: { params: { id: number } }) {
             </div>
             <div className="mt-6">
               <span className=" text-4xl font-semibold  text-primaryColor">
-                ₦{product?.price}
+                £‌{product?.price}
               </span>
             </div>
             <div className="mt-4">
@@ -361,7 +365,7 @@ function ProductPage({ params }: { params: { id: number } }) {
               </span>{' '}
               <span
                 className="hover:text-primaryColor cursor-pointer"
-                onClick={toggleSlider}
+                onClick={() => setOpenModal(true)}
               >
                 Size chart
               </span>
@@ -381,7 +385,10 @@ function ProductPage({ params }: { params: { id: number } }) {
           style="underline"
         >
           <Tabs.Item active title="Description">
-            <p className="p-2"> {product?.description}</p>
+            <span
+              className="p-2"
+              dangerouslySetInnerHTML={{ __html: product?.description ?? '' }}
+            ></span>
           </Tabs.Item>
           <Tabs.Item title="Review">
             <div className="w-full p-2 flex flex-col justify-center items-center">
@@ -447,31 +454,23 @@ function ProductPage({ params }: { params: { id: number } }) {
         ))}
       </div>
 
-      <div className="relative flex items-end">
-        <div
-          className={`${
-            sliderVisible ? 'translate-y-0' : 'translate-y-full'
-          } fixed bottom-0 left-0 w-full h-auto bg-white p-4 border-t transition-transform ease-in-out duration-300`}
-        >
-          <p className="text-gray-800">Size Chart</p>
-          <button
-            onClick={toggleSlider}
-            className="mt-2 bg-red-500 text-white px-4 py-2 rounded-md"
-          >
-            Close
-          </button>
-          <div className="w-full h-96">
-            <Images
-              src="/images/sizechart.jpg"
-              alt="Size Chart"
-              width={969}
-              height={500}
-              Object-cover
-              className="w-full"
-            />
+      <Modal dismissible show={openModal} onClose={() => setOpenModal(false)}>
+        <Modal.Header>Size Chart</Modal.Header>
+        <Modal.Body>
+          <div className="space-y-6">
+            <div className="w-full h-96">
+              <Images
+                src="/images/sizechart.jpg"
+                alt="Size Chart"
+                width={969}
+                height={500}
+                Object-cover
+                className="w-full"
+              />
+            </div>
           </div>
-        </div>
-      </div>
+        </Modal.Body>
+      </Modal>
 
       <Footer />
     </div>

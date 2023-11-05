@@ -2,6 +2,7 @@
 const nextConfig = {
   images: {
     domains: [
+      'localhost',
       'via.placeholder.com',
       'placehold.co',
       'fakestoreapi.com',
