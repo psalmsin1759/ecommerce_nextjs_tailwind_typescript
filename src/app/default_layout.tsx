@@ -12,7 +12,7 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
       <Provider store={store}>
         {/* <PersistGate loading={null} persistor={persistor}> */}
         <UserProvider>
-          <header className="fixed top-0 w-full z-50 bg-primaryColor text-white">
+          <header className="fixed top-0 w-full z-50 bg-white text-black">
             <Header />
           </header>
 

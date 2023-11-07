@@ -12,6 +12,8 @@ import { Alert } from 'flowbite-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { addToCart } from '@/redux/cart/cartSelector';
 import imageBasePath from '@/components/common/path';
+import { addToWishList } from '@/model/wishlist';
+import { useUser } from '@/context/UserContext';
 
 interface ProductCardProps {
   product: Product;
@@ -42,6 +44,17 @@ function ProductListCard({ product }: ProductCardProps) {
   const handleAddToCart = () => {
     dispatch(addToCart(product, quantity, ''));
   };
+
+  const { state } = useUser();
+
+  async function addProductToWishlist(productName: string) {
+    if (state.user) {
+      const response = await addToWishList(state.user.id, product.id);
+      alert(productName + ' add to wishlist');
+    } else {
+      alert('Please login to perform this operation');
+    }
+  }
 
   return (
     <>
@@ -103,7 +116,7 @@ function ProductListCard({ product }: ProductCardProps) {
             <button
               type="button"
               className="primaryColorButtonNoPadding p-2 shadow"
-              onClick={() => handleWishlist(product.name, product.id)}
+              onClick={() => addProductToWishlist(product.name)}
             >
               <AiOutlineHeart size="26" />
             </button>

@@ -89,7 +89,7 @@ function Footer() {
             <div className="text-teal-600">
               <Image
                 className=""
-                src="/images/logo2.png"
+                src="https://placehold.co/237x80"
                 alt="Logo"
                 width={237}
                 height={80}
@@ -297,7 +297,7 @@ function Footer() {
 
         <div className="flex flex-col gap-2 md:flex-row md:justify-between">
           <p className="text-xs text-gray-500">
-            &copy; 2023 Eppagelia. All rights reserved.
+            &copy; 2023 Bakers. All rights reserved.
           </p>
           <div className="flex flex-row gap-2">
             <FaCcVisa size="32" />

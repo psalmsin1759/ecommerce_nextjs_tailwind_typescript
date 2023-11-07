@@ -229,7 +229,7 @@ export default function Login() {
 
       dispatch({ type: 'LOGIN', payload: user });
 
-      router.push('/');
+      router.push('/profile');
     } else {
       const message = response.data.message;
       alert(message);

@@ -304,7 +304,7 @@ function CheckoutPage() {
       payment_method: selectedShippingMethod,
       total_price: total,
       tax: 0,
-      status: 'Success',
+      status: 'Processing',
       discount: discount,
       currency: 'NGR',
       shipping_price: shippingCost,

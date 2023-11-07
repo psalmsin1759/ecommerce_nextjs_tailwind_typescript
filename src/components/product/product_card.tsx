@@ -10,6 +10,8 @@ import { Carousel } from 'flowbite-react';
 import Link from 'next/link';
 import { Alert } from 'flowbite-react';
 import imageBasePath from '@/components/common/path';
+import { addToWishList } from '@/model/wishlist';
+import { useUser } from '@/context/UserContext';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { addToCart } from '@/redux/cart/cartSelector';
@@ -43,6 +45,17 @@ function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = () => {
     dispatch(addToCart(product, quantity, ''));
   };
+
+  const { state } = useUser();
+
+  async function addProductToWishlist(productName: string) {
+    if (state.user) {
+      const response = await addToWishList(state.user.id, product.id);
+      alert(productName + ' add to wishlist');
+    } else {
+      alert('Please login to perform this operation');
+    }
+  }
   return (
     <>
       <div className="w-fullh-250 border-2  flex flex-col items-center  relative group hover:border-primaryColor hover:border-2">
@@ -106,7 +119,7 @@ function ProductCard({ product }: ProductCardProps) {
           <button
             type="button"
             className="whiteToPrimaryColorButton p-2 shadow"
-            onClick={() => handleWishlist(product.name, product.id)}
+            onClick={() => addProductToWishlist(product.name)}
           >
             <AiOutlineHeart size="24" />
           </button>

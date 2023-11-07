@@ -27,3 +27,15 @@ body {
 .categorybar {
   @apply pl-6 pr-6 pt-4 pb-4 border-gray-200 hover:text-primaryColor border;
 }
+
+.image-magnifier {
+  .image-magnifier__zoomed {
+    display: block;
+    position: absolute;
+    background-size: 400px; /* Adjust the size as needed */
+    width: 400px; /* Adjust the size as needed */
+    height: 400px; /* Adjust the size as needed */
+    border: 1px solid #ccc; /* Optional: Add a border for the zoomed image */
+    z-index: 1;
+  }
+}

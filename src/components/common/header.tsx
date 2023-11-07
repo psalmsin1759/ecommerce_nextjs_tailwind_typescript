@@ -119,9 +119,9 @@ export default function HeaderNew() {
                     <Link href={'/'}>
                       <Image
                         className=" w-64"
-                        src="/images/try4.png"
+                        src="https://bakersluxury.com/wp-content/uploads/2019/11/header-logo.png"
                         alt="Logo"
-                        width={300}
+                        width={222}
                         height={60}
                       />
                     </Link>

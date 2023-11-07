@@ -24,6 +24,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { addToCart } from '@/redux/cart/cartSelector';
 import imageBasePath from '@/components/common/path';
 import { Modal } from 'flowbite-react';
+import { addToWishList } from '@/model/wishlist';
+import { useUser } from '@/context/UserContext';
+import InnerImageZoom from 'react-inner-image-zoom';
+import ImageMagnifier from '@/components/magnifier/image_magifier';
 
 function ProductPage({ params }: { params: { id: number } }) {
   const [openModal, setOpenModal] = useState(false);
@@ -154,6 +158,17 @@ function ProductPage({ params }: { params: { id: number } }) {
     },
     tabpanel: 'py-3',
   };
+
+  const { state } = useUser();
+
+  async function addProductToWishlist(productName: string) {
+    if (state.user) {
+      const response = await addToWishList(state.user.id, product?.id ?? 0);
+      alert(productName + ' add to wishlist');
+    } else {
+      alert('Please login to perform this operation');
+    }
+  }
 
   return (
     <div className="mt-4 w-screen min-h-60">
@@ -360,9 +375,12 @@ function ProductPage({ params }: { params: { id: number } }) {
               <span className="text-white text-lg">Add to cart</span>
             </button>
             <div className="flex flex-row mt-4 gap-2 cursor-pointer">
-              <span className="hover:text-primaryColor cursor-pointer">
+              <button
+                className="hover:text-primaryColor cursor-pointer"
+                onClick={() => addProductToWishlist(product!.name)}
+              >
                 Add to wishlist
-              </span>{' '}
+              </button>{' '}
               <span
                 className="hover:text-primaryColor cursor-pointer"
                 onClick={() => setOpenModal(true)}
