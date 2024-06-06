@@ -13,6 +13,7 @@ import { useForm, Controller } from 'react-hook-form';
 
 import { User, useUser } from '@/context/UserContext';
 import { useRouter } from 'next/navigation';
+import { Button } from 'flowbite-react';
 
 import qs from 'qs';
 
@@ -22,17 +23,20 @@ interface ILoginFormInput {
 }
 
 interface IRegistrationFormInput {
-  firstname: string;
-  lastname: string;
   email: string;
-  password: string;
-  address: string;
-  //city?: string;
+  firstName: string;
+  lastName: string;
+  //address: string;
+  city: string;
   state: string;
-  //postalCode?: string;
-  //phone?: string;
+  postalCode: string;
+  country: string;
+  phone: string;
+  password?: string;
 }
 export default function Login() {
+  const [isLoading, setIsLoading] = useState(false);
+
   const redTheme = {
     base: 'flex flex-col gap-2',
     tablist: {
@@ -96,6 +100,7 @@ export default function Login() {
   );
 
   const [selectedCountry, setSelectedCountry] = useState<string>('GB');
+  const [selectedAddress, setSelectedAddress] = useState<string>('');
 
   const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCountry(event.target.value);
@@ -114,6 +119,7 @@ export default function Login() {
           if (status === google.maps.places.PlacesServiceStatus.OK) {
             const addressComponents = placeDetails.address_components;
 
+            const fullAddress = placeDetails.formatted_address;
             // Initialize variables to store city, state, and postal code
             let city = '';
             let state = '';
@@ -131,21 +137,14 @@ export default function Login() {
                 postalCode = component.long_name;
               }
             }
+
+            setSelectedAddress(fullAddress);
+
             registrationReset({
-              //city: city,
+              city: city,
               state: state,
-              // postalCode: postalCode,
+              postalCode: postalCode,
             });
-
-            /*  reset({
-                  city,
-                  state,
-                  postalCode,
-                }); */
-
-            //setCity(city);
-            //setPlaceState(state);
-            //setPostalCode(postalCode);
           }
         }
       );
@@ -162,15 +161,16 @@ export default function Login() {
   });
 
   const registerSchema = Yup.object().shape({
-    firstname: Yup.string().required('First Name is required'),
-    lastname: Yup.string().required('Last Name is required'),
     email: Yup.string().required('Email is required').email('Email is invalid'),
-    password: Yup.string().required('Password is required'),
-    address: Yup.string().required('Address is required'),
+    firstName: Yup.string().required('First Name is required'),
+    lastName: Yup.string().required('Last Name is required'),
+    //address: Yup.string().required('address is required'),
+    city: Yup.string().required('city is required'),
     state: Yup.string().required('State is required'),
-    //city: Yup.string(),
-    //postalCode: Yup.string(),
-    //phone: Yup.string(),
+    postalCode: Yup.string().required('Postal Code is required'),
+    phone: Yup.string().required('Phone is required'),
+    country: Yup.string().required('Country is required'),
+    password: Yup.string(),
   });
 
   const {
@@ -192,6 +192,7 @@ export default function Login() {
   });
 
   const onSubmitLogin = async (data: ILoginFormInput) => {
+    setIsLoading(true);
     const input = {
       email: data.email,
       password: data.password,
@@ -227,6 +228,11 @@ export default function Login() {
         country: country,
       };
 
+      window.localStorage.setItem(
+        'userData',
+        JSON.stringify(response?.data.data)
+      );
+
       dispatch({ type: 'LOGIN', payload: user });
 
       router.push('/profile');
@@ -234,18 +240,20 @@ export default function Login() {
       const message = response.data.message;
       alert(message);
     }
+    setIsLoading(false);
   };
   const onSubmitRegister = async (data: IRegistrationFormInput) => {
+    setIsLoading(true);
     console.log('regiser');
     const input = {
-      first_name: data.firstname,
-      last_name: data.lastname,
+      first_name: data.firstName,
+      last_name: data.lastName,
       email: data.email,
-      //phone: data.phone,
+      phone: data.phone,
       password: data.password,
-      address: data.address,
-      //city: data.city,
-      //postal_code: data.postalCode,
+      address: selectedAddress,
+      city: data.city,
+      postal_code: data.postalCode,
       state: data.state,
       country: selectedCountry,
     };
@@ -282,6 +290,11 @@ export default function Login() {
         country: country,
       };
 
+      window.localStorage.setItem(
+        'userData',
+        JSON.stringify(response?.data.data)
+      );
+
       dispatch({ type: 'LOGIN', payload: user });
 
       router.push('/');
@@ -289,6 +302,7 @@ export default function Login() {
       const message = response.data.message;
       alert(message);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -352,12 +366,13 @@ export default function Login() {
                     </Link>
                   </div>
 
-                  <button
+                  <Button
                     type="submit"
+                    isProcessing={isLoading}
                     className="primaryColorButton hover:bg-goldColor  mb-6"
                   >
                     Submit
-                  </button>
+                  </Button>
                 </form>
               </div>
             </div>
@@ -377,10 +392,10 @@ export default function Login() {
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
                       placeholder=""
                       required
-                      {...registrationRegister('firstname')}
+                      {...registrationRegister('firstName')}
                     />
                     <span className="text-red-500">
-                      {registrationErrors.errors.firstname?.message}
+                      {registrationErrors.errors.firstName?.message}
                     </span>
                   </div>
 
@@ -394,10 +409,10 @@ export default function Login() {
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
                       placeholder=""
                       required
-                      {...registrationRegister('lastname')}
+                      {...registrationRegister('lastName')}
                     />
                     <span className="text-red-500">
-                      {registrationErrors.errors.lastname?.message}
+                      {registrationErrors.errors.lastName?.message}
                     </span>
                   </div>
 
@@ -475,7 +490,6 @@ export default function Login() {
                           }}
                           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
                           onPlaceSelected={handlePlaceSelected}
-                          /*  {...registrationRegister('address')} */
                         />
                       </div>
                     </div>
@@ -491,7 +505,7 @@ export default function Login() {
                         id="city"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
                         placeholder=""
-                        /*  {...registrationRegister('city')} */
+                        {...registrationRegister('city')}
                       />
                     </div>
                     <div className="w-full basis-1/2">
@@ -521,7 +535,7 @@ export default function Login() {
                         id="postalcode"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
                         placeholder=""
-                        /* {...registrationRegister('postalCode')} */
+                        {...registrationRegister('postalCode')}
                       />
                     </div>
                     <div className="w-full basis-1/2">
@@ -534,17 +548,18 @@ export default function Login() {
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primaryColor focus:border-primaryColor block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primaryColor dark:focus:border-primaryColor"
                         placeholder=""
                         required={true}
-                        /*  {...registrationRegister('phone')} */
+                        {...registrationRegister('phone')}
                       />
                     </div>
                   </div>
 
-                  <button
+                  <Button
                     type="submit"
+                    isProcessing={isLoading}
                     className="primaryColorButton mt-6 mb-6 hover:bg-goldColor"
                   >
                     Submit
-                  </button>
+                  </Button>
                 </form>
               </div>
             </div>

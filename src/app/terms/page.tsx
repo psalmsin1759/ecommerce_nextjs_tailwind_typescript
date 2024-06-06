@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { Breadcrumb } from 'flowbite-react';
 import { HiHome } from 'react-icons/hi';
-import Footer from '@/components/common/footer';
 import { getStoreData, Store } from '@/model/store';
 
 function TermsPage() {
@@ -71,7 +70,6 @@ function TermsPage() {
           dangerouslySetInnerHTML={{ __html: store.terms }}
         ></span>
       </div>
-      <Footer />
     </div>
   );
 }

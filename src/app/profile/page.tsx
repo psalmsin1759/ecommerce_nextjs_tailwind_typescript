@@ -2,7 +2,6 @@
 import React from 'react';
 import { Breadcrumb } from 'flowbite-react';
 import { HiHome } from 'react-icons/hi';
-import Footer from '@/components/common/footer';
 
 import Login from '@/components/login/login';
 import MyProfile from '@/components/myprofile/myprofile';
@@ -21,7 +20,6 @@ export default function ProfilePage() {
       </div>
       {/* <Login /> */}
       <MyProfile />
-      <Footer />
     </div>
   );
 }

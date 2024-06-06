@@ -14,6 +14,7 @@ import { addToCart } from '@/redux/cart/cartSelector';
 import imageBasePath from '@/components/common/path';
 import { addToWishList } from '@/model/wishlist';
 import { useUser } from '@/context/UserContext';
+import { useRouter } from 'next/navigation';
 
 interface ProductCardProps {
   product: Product;
@@ -41,10 +42,14 @@ function ProductListCard({ product }: ProductCardProps) {
   }
 
   const dispatch = useDispatch();
+  const router = useRouter();
   const handleAddToCart = () => {
-    dispatch(addToCart(product, quantity, ''));
+    if (product.variants && product.variants.length > 0) {
+      router.push(`/product/${product.id}`);
+    } else {
+      dispatch(addToCart(product, quantity, ''));
+    }
   };
-
   const { state } = useUser();
 
   async function addProductToWishlist(productName: string) {
@@ -94,15 +99,15 @@ function ProductListCard({ product }: ProductCardProps) {
           {product.discounted_price > 0 ? (
             <div className="flex flex-row gap-2 items-center">
               <span className="text-xl font-semibold">
-                £{product.discounted_price}
+                ${product.discounted_price}
               </span>
               <del>
                 {' '}
-                <span className="text-md text-gray-500">£{product.price}</span>
+                <span className="text-md text-gray-500">${product.price}</span>
               </del>
             </div>
           ) : (
-            <span className="text-xl font-semibold">£{product.price}</span>
+            <span className="text-xl font-semibold">${product.price}</span>
           )}
 
           <div className="flex flex-row gap-2 justify-center">
@@ -115,14 +120,14 @@ function ProductListCard({ product }: ProductCardProps) {
             </button>
             <button
               type="button"
-              className="primaryColorButtonNoPadding p-2 shadow"
+              className="hidden md:block primaryColorButtonNoPadding p-2 shadow"
               onClick={() => addProductToWishlist(product.name)}
             >
               <AiOutlineHeart size="26" />
             </button>
             <button
               type="button"
-              className="primaryColorButtonNoPadding p-2 shadow"
+              className="hidden md:block primaryColorButtonNoPadding p-2 shadow"
               onClick={() => props.setOpenModal('default')}
             >
               <AiOutlineSearch size="26" />
@@ -167,7 +172,7 @@ function ProductListCard({ product }: ProductCardProps) {
                 </div>
                 <hr className="mt-4 mb-4" />
                 <span className="text-2xl mt-4 mb-4 font-semibold">
-                  £‌{product.price}
+                  ${product.price}
                 </span>
                 <hr className="mt-4" />
                 <div className="flex flex-row mt-4 gap-4 items-center">

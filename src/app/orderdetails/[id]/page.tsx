@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { Breadcrumb } from 'flowbite-react';
 import { HiHome } from 'react-icons/hi';
-import Footer from '@/components/common/footer';
 import { Progress } from 'flowbite-react';
 import {
   getOrderByID,
@@ -116,14 +115,13 @@ function OrderDetails({ params }: { params: { id: number } }) {
           <div className="w-full flex-col p-8 bg-white gap-2">
             <span className="text-lg font-semibold ">Items</span>
             <div className="mt-2">
-              {orderProducts?.map((orderProduct: OrderProduct) => (
-                <OrderItemList orderProduct={orderProduct} />
+              {orderProducts?.map((orderProduct: OrderProduct, index) => (
+                <OrderItemList key={index} orderProduct={orderProduct} />
               ))}
             </div>
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

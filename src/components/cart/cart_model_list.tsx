@@ -2,39 +2,42 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Product } from '@/model/Product';
-import { removeFromCart } from '@/redux/cart/cartSlice';
+import { CartItem, removeFromCart } from '@/redux/cart/cartSlice';
 import { useDispatch } from 'react-redux';
 import imageBasePath from '@/components/common/path';
 
 interface ProductCardProps {
-  product: Product;
+  cartItem: CartItem;
 }
 
-function CartModalList({ product }: ProductCardProps) {
+function CartModalList({ cartItem }: ProductCardProps) {
   const dispatch = useDispatch();
 
   const handleRemoveFromCart = () => {
-    dispatch(removeFromCart(product));
+    dispatch(removeFromCart(cartItem.product));
   };
 
   return (
     <div className="flex flex-row justify-between items-start mt-1 mr-4 ml-4">
       <div className="border p-2 overflow-hidden">
-        <Link href={`/product/${product.id}`}>
+        <Link href={`/product/${cartItem.product.id}`}>
           <Image
-            src={imageBasePath + 'product/' + product.images[0]?.path}
-            alt={product.name}
+            src={imageBasePath + 'product/' + cartItem.product.images[0]?.path}
+            alt={cartItem.product.name}
             width={80}
             height={106}
           />
         </Link>
       </div>
       <div className="m-4">
-        <span className="text-gray-500 font-semibold">{product.name}</span>
+        <span className="text-gray-500 font-semibold block">
+          {cartItem.product.name}
+        </span>
+        <span className="text-gray-400 text-sm">{cartItem.options}</span>
         <div className="flex flex-row gap-2">
-          <span>{product.quantity}</span>
+          <span>{cartItem.quantity}</span>
           <span>X</span>
-          <span>£‌{product.price}</span>
+          <span>${cartItem.product.price}</span>
         </div>
       </div>
       <div

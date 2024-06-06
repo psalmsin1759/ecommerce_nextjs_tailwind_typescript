@@ -26,8 +26,10 @@ export default function MyProfile() {
     useState<string>('My Profile');
 
   const handleLogout = () => {
+    window.localStorage.removeItem('userData');
     dispatch({ type: 'LOGOUT' });
     router.replace('/');
+    window.location.reload();
   };
 
   const renderSelectedComponent = () => {

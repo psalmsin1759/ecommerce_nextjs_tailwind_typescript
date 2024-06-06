@@ -10,6 +10,7 @@ function OrderListPage() {
   const [orders, setOrders] = useState<Order[]>([]);
 
   const { state } = useUser();
+  const userData = window.localStorage.getItem('userData');
 
   useEffect(() => {
     loadProducts();
@@ -17,7 +18,8 @@ function OrderListPage() {
 
   const loadProducts = async () => {
     try {
-      const orderData = await getOrders(state.user?.id ?? 0);
+      const user = JSON.parse(userData!);
+      const orderData = await getOrders(user.id ?? 0);
 
       setOrders(orderData);
     } catch (error) {
@@ -42,8 +44,11 @@ function OrderListPage() {
           <Table.HeadCell>Total</Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y border">
-          {orders?.map((order: Order) => (
-            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+          {orders?.map((order: Order, index) => (
+            <Table.Row
+              key={index}
+              className="bg-white dark:border-gray-700 dark:bg-gray-800"
+            >
               <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                 <Link
                   href={'/orderdetails/' + order.orderid}

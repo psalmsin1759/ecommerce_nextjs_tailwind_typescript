@@ -2,7 +2,6 @@
 import React from 'react';
 import { Breadcrumb } from 'flowbite-react';
 import { HiHome } from 'react-icons/hi';
-import Footer from '@/components/common/footer';
 
 import Login from '@/components/login/login';
 
@@ -19,8 +18,6 @@ function LoginPage() {
         </Breadcrumb>
       </div>
       <Login />
-
-      <Footer />
     </div>
   );
 }

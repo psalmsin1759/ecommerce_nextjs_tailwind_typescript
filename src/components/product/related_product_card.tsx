@@ -86,20 +86,22 @@ function RelatedProductCard({ product }: ProductCardProps) {
               </span>
             </Link>
           </div>
-          {product.discounted_price > '0' ? (
+          {product.discounted_price > 0 ? (
             <div className="flex flex-col md:flex-row md:gap-2  items-center">
               <span className="text-base md:text-xl font-semibold">
-                £{product.discounted_price}
+                ${product.discounted_price}
               </span>
               <del>
                 {' '}
                 <span className="text-base md:text-xl text-gray-500">
-                  £{product.price}
+                  ${product.price}
                 </span>
               </del>
             </div>
           ) : (
-            <span className="text-xl font-semibold">£{product.price}</span>
+            <span className="text-base md:text-xl font-semibold">
+              ${product.price}
+            </span>
           )}
         </div>
         {/*  <div className="absolute top-64 left-0 right-0 flex flex-row gap-2 justify-center opacity-0 transition-opacity group-hover:opacity-100">

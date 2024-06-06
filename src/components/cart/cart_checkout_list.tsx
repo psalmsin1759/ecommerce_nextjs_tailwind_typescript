@@ -1,19 +1,19 @@
 import React from 'react';
 import { Product } from '@/model/Product';
-import { removeFromCart } from '@/redux/cart/cartSlice';
+import { CartItem, removeFromCart } from '@/redux/cart/cartSlice';
 import { useDispatch } from 'react-redux';
 import Image from 'next/image';
 import imageBasePath from '@/components/common/path';
 
 interface ProductCardProps {
-  product: Product;
+  cartItem: CartItem;
 }
 
-function CartCheckoutList({ product }: ProductCardProps) {
+function CartCheckoutList({ cartItem }: ProductCardProps) {
   const dispatch = useDispatch();
 
   const handleRemoveFromCart = () => {
-    dispatch(removeFromCart(product));
+    dispatch(removeFromCart(cartItem.product));
   };
 
   return (
@@ -21,18 +21,20 @@ function CartCheckoutList({ product }: ProductCardProps) {
       <div className="flex flex-row">
         <div className="bg-white p-2">
           <Image
-            src={imageBasePath + 'product/' + product.images[0]?.path}
-            alt={product.name}
+            src={imageBasePath + 'product/' + cartItem.product.images[0]?.path}
+            alt={cartItem.product.name}
             width={90}
             height={116}
           />
         </div>
         <div className="m-4">
-          <span className="text-gray-500 font-semibold">{product.name}</span>
+          <span className="text-gray-500 font-semibold">
+            {cartItem.product.name}
+          </span>
           <div className="flex flex-row gap-2">
-            <span>{product.quantity}</span>
+            <span>{cartItem.quantity}</span>
             <span>X</span>
-            <span>{product.price}</span>
+            <span>{cartItem.product.price}</span>
           </div>
         </div>
       </div>

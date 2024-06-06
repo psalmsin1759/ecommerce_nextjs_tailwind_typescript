@@ -18,7 +18,7 @@ export interface Product {
   images: Image[];
   variants: Variant[];
   relatedproducts: RelatedProduct[];
-  option: string;
+  /* option: string; */
 }
 
 export interface Image {
@@ -45,8 +45,8 @@ export interface RelatedProduct {
   sku: string;
   quantity: number;
   description: string;
-  price: string;
-  discounted_price: string;
+  price: number;
+  discounted_price: number;
   new_arrival: number;
   product_id: number;
   images: Image[];

@@ -62,15 +62,13 @@ export default function HeaderNew() {
 
   const loadCategories = async () => {
     try {
-      const productsData = await getAllCategories();
+      const data = await getAllCategories();
 
-      const mainCategories = productsData.filter(
+      const mainCategories = data.filter(
         (category) => category.parent_id === 0
       );
       setCategories(mainCategories);
-      setSubcategories(
-        productsData.filter((category) => category.parent_id !== 0)
-      );
+      setSubcategories(data.filter((category) => category.parent_id !== 0));
     } catch (error) {
       console.error('Failed to fetch products:', error);
     }
@@ -79,6 +77,16 @@ export default function HeaderNew() {
 
   const { state } = useUser();
 
+  let userData: string | null;
+
+  if (typeof window !== 'undefined') {
+    // This code will only run in a browser environment
+    userData = window.localStorage.getItem('userData');
+  } else {
+    // Handle the case when it's not running in a browser (e.g., server-side rendering)
+    userData = null; // Or assign a default value as needed
+  }
+
   const { dispatch } = useUser();
 
   const handleLogout = () => {
@@ -86,6 +94,34 @@ export default function HeaderNew() {
     console.log('logout');
     dispatch({ type: 'LOGOUT' });
     router.replace('/login');
+  };
+
+  const [activeCategory, setActiveCategory] = useState<number | null>(null);
+
+  const handleCategoryClick = (categoryId: number) => {
+    if (activeCategory === categoryId) {
+      setActiveCategory(null); // Collapse subcategories
+    } else {
+      setActiveCategory(categoryId); // Expand subcategories
+    }
+
+    // Close the existing submenu
+    setExpandedSubcategories([]);
+  };
+
+  const [expandedSubcategories, setExpandedSubcategories] = useState<number[]>(
+    []
+  );
+
+  const handleSubcategoryClick = (subcategoryID: number) => {
+    // Toggle the expansion state of the clicked subcategory
+    if (expandedSubcategories.includes(subcategoryID)) {
+      setExpandedSubcategories(
+        expandedSubcategories.filter((id) => id !== subcategoryID)
+      );
+    } else {
+      setExpandedSubcategories([...expandedSubcategories, subcategoryID]);
+    }
   };
 
   return (
@@ -99,60 +135,114 @@ export default function HeaderNew() {
           <>
             <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 ">
               <div className="relative flex h-16 items-center justify-between">
-                <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+                <div className="absolute inset-y-0 left-0 flex items-center md:hidden">
                   {/* Mobile menu button*/}
-                  <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-primaryColor hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-black">
+                  <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-primaryColor hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                     <span className="absolute -inset-0.5" />
                     <span className="sr-only">Open main menu</span>
                     {open ? (
                       <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
                     ) : (
                       <AiOutlineMenu
-                        className="block h-6 w-6 text-black"
+                        className="block h-6 w-6 "
                         aria-hidden="true"
                       />
                     )}
                   </Disclosure.Button>
                 </div>
+
                 <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                  <div className="flex flex-shrink-0 items-center">
+                  <div className="ml-6 flex flex-shrink-0 items-center">
                     <Link href={'/'}>
                       <Image
-                        className=" w-64"
-                        src="https://bakersluxury.com/wp-content/uploads/2019/11/header-logo.png"
+                        className=" "
+                        src={'/images/bakerslogo.png'}
                         alt="Logo"
-                        width={222}
-                        height={60}
+                        width={204}
+                        height={55}
                       />
                     </Link>
                   </div>
-                  <div className="hidden sm:ml-6 sm:block">
-                    <div className="flex mt-4 mx-auto space-x-4">
-                      {categories?.map((category: Category) => (
-                        <Link
-                          key={category.id}
-                          href={`/category/${category.id}`}
-                          className="text-black-900 hover:font-semibold rounded-md px-3 py-2 text-md font-medium"
-                          aria-current="page"
+
+                  <div className="hidden sm:ml-6 md:block ">
+                    <div className="flex mt-4 space-x-4">
+                      {categories.map((category: Category, index) => (
+                        <div
+                          key={index}
+                          className="relative hover:font-semibold rounded-md px-3 py-2 text-md font-medium cursor-pointer"
                         >
-                          {category.name}
-                        </Link>
+                          <div className="flex items-center justify-between gap-0">
+                            <Link
+                              href={`/category/${category.id}`}
+                              className="hover:font-semibold rounded-md px-2 py-2 text-md font-medium"
+                              aria-current="page"
+                            >
+                              {category.name}
+                            </Link>
+
+                            {subcategories.some(
+                              (subcategory) =>
+                                subcategory.parent_id === category.id
+                            ) && (
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className={`w-4 h-4 ${
+                                  expandedSubcategories.includes(category.id)
+                                    ? 'transform rotate-180'
+                                    : ''
+                                }`}
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                onClick={() =>
+                                  handleSubcategoryClick(category.id)
+                                }
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M19 9l-7 7-7-7"
+                                />
+                              </svg>
+                            )}
+                          </div>
+                          <div
+                            className={`${
+                              expandedSubcategories.includes(category.id)
+                                ? 'block'
+                                : 'hidden'
+                            } w-full bg-white border border-gray-300 rounded-lg absolute z-10`}
+                          >
+                            {subcategories
+                              .filter(
+                                (subcategory) =>
+                                  subcategory.parent_id === category.id
+                              )
+                              .map((subcategory, index) => (
+                                <div
+                                  key={index}
+                                  className="px-4 py-2 cursor-pointer bg-white"
+                                >
+                                  <Disclosure.Button
+                                    as={Link}
+                                    href={`/category/${subcategory.id}`}
+                                  >
+                                    {subcategory.name}
+                                  </Disclosure.Button>
+                                  {/* <Link
+                                    key={subcategory.id}
+                                    href={`/category/${subcategory.id}`}
+                                    className="text-black hover:text-primaryColor hover:font-semibold rounded-md px-3 py-2 text-md font-medium"
+                                    aria-current="page"
+                                  >
+                                    {subcategory.name}
+                                  </Link> */}
+                                </div>
+                              ))}
+                          </div>
+                        </div>
                       ))}
-                      {/* {navigation.map((item) => (
-                      <a
-                        key={item.name}
-                        href={item.href}
-                        className={classNames(
-                          item.current
-                            ? ' text-black-300'
-                            : 'text-black-900  hover:font-semibold',
-                          'rounded-md px-3 py-2 text-sm font-medium'
-                        )}
-                        aria-current={item.current ? 'page' : undefined}
-                      >
-                        {item.name}
-                      </a>
-                    ))} */}
                     </div>
                   </div>
                 </div>
@@ -162,7 +252,6 @@ export default function HeaderNew() {
                   </div>
 
                   <Dropdown
-                    dismissOnClick={false}
                     renderTrigger={() => (
                       <span>
                         <FaRegUser className=" cursor-pointer" size="26" />
@@ -170,16 +259,18 @@ export default function HeaderNew() {
                     )}
                     label={'undefined'}
                   >
-                    {state.user ? ( // Check if the user is logged in
+                    {userData ? ( // Check if the user is logged in
                       <>
                         <Dropdown.Item>
-                          <Link href="/profile">My Account</Link>
+                          <Disclosure.Button as={Link} href={`/profile`}>
+                            My Account
+                          </Disclosure.Button>
                         </Dropdown.Item>
+                        <Dropdown.Item></Dropdown.Item>
                         <Dropdown.Item>
-                          <Link href="/profile">Orders</Link>
-                        </Dropdown.Item>
-                        <Dropdown.Item>
-                          <Link href="/profile">Wishlist</Link>
+                          <Disclosure.Button as={Link} href={`/profile`}>
+                            Wishlist
+                          </Disclosure.Button>
                         </Dropdown.Item>
                         <Dropdown.Item>
                           <button type="button" onClick={handleLogout}>
@@ -190,10 +281,14 @@ export default function HeaderNew() {
                     ) : (
                       <>
                         <Dropdown.Item>
-                          <Link href="/login">Register</Link>
+                          <Disclosure.Button as={Link} href={`/login`}>
+                            Register
+                          </Disclosure.Button>
                         </Dropdown.Item>
                         <Dropdown.Item>
-                          <Link href="/login">Login</Link>
+                          <Disclosure.Button as={Link} href={`/login`}>
+                            Login
+                          </Disclosure.Button>
                         </Dropdown.Item>
                       </>
                     )}
@@ -218,32 +313,85 @@ export default function HeaderNew() {
             <Disclosure.Panel className="sm:hidden">
               <div className="space-y-1 px-2 pb-3 pt-2">
                 {categories?.map((category: Category) => (
-                  <Disclosure.Button
+                  <div
                     key={category.id}
-                    as="a"
-                    href={`category/${category.id}`}
-                    className="block rounded-md px-3 py-2 text-base font-medium hover:bg-primaryColor hover:text-white"
+                    className=" flex flex-col  cursor-pointer border-b p-4 hover:bg-primaryColor"
+                    onClick={handleCategoryClick.bind(null, category.id)}
                   >
-                    {category.name}
-                  </Disclosure.Button>
-                ))}
+                    <div className="flex items-center justify-between">
+                      {/*  <Link
+                        key={category.id}
+                        href={`/category/${category.id}`}
+                        className="text-black-900 hover:font-semibold rounded-md  text-md font-medium"
+                        aria-hidden="true"
+                      >
+                        {category.name}
+                      </Link> */}
 
-                {/*  {navigation.map((item) => (
-                  <Disclosure.Button
-                    key={item.name}
-                    as="a"
-                    href={item.href}
-                    className={classNames(
-                      item.current
-                        ? 'bg-gray-900 text-white'
-                        : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                      'block rounded-md px-3 py-2 text-base font-medium'
-                    )}
-                    aria-current={item.current ? 'page' : undefined}
-                  >
-                    {item.name}
-                  </Disclosure.Button>
-                ))} */}
+                      <Disclosure.Button
+                        as={Link}
+                        href={`/category/${category.id}`}
+                      >
+                        {category.name}
+                      </Disclosure.Button>
+
+                      {subcategories.some(
+                        (subcategory) => subcategory.parent_id === category.id
+                      ) && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className={`w-4 h-4 ${
+                            activeCategory === category.id
+                              ? 'transform rotate-180'
+                              : ''
+                          }`}
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      )}
+                    </div>
+
+                    <div
+                      className={`${
+                        activeCategory === category.id ? 'block' : 'hidden'
+                      }  w-full`}
+                    >
+                      {subcategories
+                        .filter(
+                          (subcategory) => subcategory.parent_id === category.id
+                        )
+                        .map((subcategory) => (
+                          <div
+                            key={subcategory.id}
+                            className="cursor-pointer mt-2 hover:text-white "
+                          >
+                            <Disclosure.Button
+                              as={Link}
+                              href={`/category/${subcategory.id}`}
+                            >
+                              {subcategory.name}
+                            </Disclosure.Button>
+                            {/* <Link
+                              key={subcategory.id}
+                              href={`/category/${subcategory.id}`}
+                              className=" hover:font-semibold rounded-md hover:text-black  text-md font-medium "
+                              aria-hidden="true"
+                            >
+                              {subcategory.name}
+                            </Link> */}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </Disclosure.Panel>
           </>
@@ -270,7 +418,7 @@ export default function HeaderNew() {
           </div>
           <hr className="m-4" />
 
-          <CartModal />
+          <CartModal setShowCartPanel={setShowCartPanel} />
         </div>
       </div>
     </>

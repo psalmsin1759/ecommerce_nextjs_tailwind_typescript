@@ -9,6 +9,7 @@ const nextConfig = {
       'i8.amplience.net',
       'bakersluxury.com',
       'monster.themevolty.com',
+      'canadabackend.samsonude.dev',
     ],
   },
 };

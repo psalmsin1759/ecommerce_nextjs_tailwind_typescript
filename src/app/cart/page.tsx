@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Footer from '@/components/common/footer';
 import { Breadcrumb } from 'flowbite-react';
 import { HiHome } from 'react-icons/hi';
 //import CartList from '@/components/product/cart/cart_list';
@@ -57,8 +56,8 @@ function CartPage() {
                 <span className="font-semibold text-sm">Subtotal</span>
               </div>
             </div>
-            {cartItems.map((cartItem) => (
-              <CartList2 product={cartItem} />
+            {cartItems.map((cartItem, key) => (
+              <CartList2 key={key} cartItem={cartItem} />
             ))}
 
             <hr className="mt-4" />
@@ -76,7 +75,7 @@ function CartPage() {
             <span className="text-3xl font-semibold">Cart totals</span>
             <div className="flex flex-row justify-between mt-12 mb-4">
               <span>Subtotal</span>
-              <span>£‌{grandTotal}</span>
+              <span>${grandTotal}</span>
             </div>
             <hr className="text-black" />
             <div className="flex flex-row justify-between mt-6 mb-4">
@@ -86,7 +85,7 @@ function CartPage() {
             <hr />
             <div className="flex flex-row justify-between mt-6 mb-4">
               <span>Total</span>
-              <span className="text-2xl font-semibold">£‌{grandTotal}</span>
+              <span className="text-2xl font-semibold">${grandTotal}</span>
             </div>
             <Link href={'/checkout'}>
               <div className="w-full rounded-full bg-black hover:bg-goldColor p-2 text-center mt-6">
@@ -96,8 +95,6 @@ function CartPage() {
           </div>
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }

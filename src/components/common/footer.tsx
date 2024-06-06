@@ -81,6 +81,18 @@ function Footer() {
 
   const { state } = useUser();
 
+  let userData: string | null;
+
+  if (typeof window !== 'undefined') {
+    // This code will only run in a browser environment
+    userData = window.localStorage.getItem('userData');
+  } else {
+    // Handle the case when it's not running in a browser (e.g., server-side rendering)
+    userData = null; // Or assign a default value as needed
+  }
+
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className="w-full bg-footerColor border-t border-gray-300 mt-8 text-white">
       <div className="w-screen flex flex-col p-4  md:p-20 gap-4">
@@ -89,10 +101,10 @@ function Footer() {
             <div className="text-teal-600">
               <Image
                 className=""
-                src="https://placehold.co/237x80"
+                src={'/images/bakerslogo.png'}
                 alt="Logo"
-                width={237}
-                height={80}
+                width={204}
+                height={55}
               />
             </div>
 
@@ -177,8 +189,8 @@ function Footer() {
               <p className="font-medium ">Categories</p>
 
               <ul className="mt-6 space-y-4 text-sm text-footerTextColor">
-                {categories?.map((category: Category) => (
-                  <li>
+                {categories?.map((category: Category, index) => (
+                  <li key={index}>
                     <Link
                       key={category.id}
                       href={`/category/${category.id}`}
@@ -197,7 +209,7 @@ function Footer() {
               <ul className="mt-6 space-y-4 text-sm">
                 <li>
                   <Link
-                    href={state.user ? '/profile' : '/login'}
+                    href={userData ? '/profile' : '/login'}
                     className="text-footerTextColor transition hover:opacity-75"
                   >
                     My Account
@@ -206,7 +218,7 @@ function Footer() {
 
                 <li>
                   <Link
-                    href={state.user ? '/profile' : '/login'}
+                    href={userData ? '/profile' : '/login'}
                     className="text-footerTextColor transition hover:opacity-75"
                   >
                     Order History
@@ -215,7 +227,7 @@ function Footer() {
 
                 <li>
                   <Link
-                    href={state.user ? '/profile' : '/login'}
+                    href={userData ? '/profile' : '/login'}
                     className="text-footerTextColor transition hover:opacity-75"
                   >
                     Wish List
@@ -297,7 +309,7 @@ function Footer() {
 
         <div className="flex flex-col gap-2 md:flex-row md:justify-between">
           <p className="text-xs text-gray-500">
-            &copy; 2023 Bakers. All rights reserved.
+            &copy; {currentYear} Bakers Luxury. All rights reserved.
           </p>
           <div className="flex flex-row gap-2">
             <FaCcVisa size="32" />

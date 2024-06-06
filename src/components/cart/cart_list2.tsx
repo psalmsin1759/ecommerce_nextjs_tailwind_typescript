@@ -5,30 +5,32 @@ import {
   removeFromCart,
   increaseQuantity,
   decreaseQuantity,
+  CartItem,
 } from '@/redux/cart/cartSlice';
 import { selectSubtotalForProduct } from '@/redux/cart/cartSelector';
 import { useSelector, useDispatch } from 'react-redux';
 import imageBasePath from '@/components/common/path';
 
 interface ProductCardProps {
-  product: Product;
+  cartItem: CartItem;
 }
 
-function CartList2({ product }: ProductCardProps) {
+function CartList2({ cartItem }: ProductCardProps) {
   const dispatch = useDispatch();
   const subtotalSelector = useSelector(selectSubtotalForProduct);
 
-  const subtotal = subtotalSelector(product.id).toFixed(2);
+  const subtotal = subtotalSelector(cartItem.product.id).toFixed(2);
   const handleRemoveFromCart = () => {
-    dispatch(removeFromCart(product));
+    dispatch(removeFromCart(cartItem.product));
   };
 
   const handleIncreaseQuantity = () => {
-    dispatch(increaseQuantity(product));
+    console.log(cartItem.options);
+    dispatch(increaseQuantity(cartItem.product));
   };
 
   const handleDecreaseQuantity = () => {
-    dispatch(decreaseQuantity(product));
+    dispatch(decreaseQuantity(cartItem.product));
   };
 
   return (
@@ -59,7 +61,11 @@ function CartList2({ product }: ProductCardProps) {
               <div className="w-20 h-28">
                 <Image
                   className="w-20 h-28"
-                  src={imageBasePath + 'product/' + product.images[0]?.path}
+                  src={
+                    imageBasePath +
+                    'product/' +
+                    cartItem.product.images[0]?.path
+                  }
                   alt="Logo"
                   width={80}
                   height={106}
@@ -68,10 +74,14 @@ function CartList2({ product }: ProductCardProps) {
             </div>
             <div className="flex flex-row gap-2 ">
               <div className="flex flex-col gap-1">
-                <span className="text-base">{product.name}</span>
-                <span className="text-sm text-gray-400">{product.option}</span>
+                <span className="text-base">{cartItem.product.name}</span>
+                <span className="text-sm text-gray-400">
+                  {cartItem.options}
+                </span>
                 <div className="md:hidden">
-                  <span className="text-red-500 mb-2 ">{product.price}</span>
+                  <span className="text-red-500 mb-2 ">
+                    {cartItem.product.price}
+                  </span>
                   <div className="rounded-full w-32 pl-4 pr-4 pt-2 pb-2 border-2 flex flex-row items-center justify-between gap-2">
                     <button type="button" onClick={handleIncreaseQuantity}>
                       <svg
@@ -90,7 +100,7 @@ function CartList2({ product }: ProductCardProps) {
                         ></path>
                       </svg>
                     </button>
-                    <span>{product.quantity}</span>
+                    <span>{cartItem.quantity}</span>
                     <button type="button" onClick={handleDecreaseQuantity}>
                       <svg
                         className="w-4"
@@ -116,7 +126,7 @@ function CartList2({ product }: ProductCardProps) {
         </div>
         <div className="hidden md:block p-6 text-center">
           {' '}
-          <span className="text-red-500">£‌{product.price}</span>
+          <span className="text-red-500">${cartItem.product.price}</span>
         </div>
         <div className="hidden md:block p-6 text-center ">
           <div className="rounded-full w-32 pl-4 pr-4 pt-2 pb-2 border-2 flex flex-row items-center justify-between gap-2">
@@ -137,7 +147,7 @@ function CartList2({ product }: ProductCardProps) {
                 ></path>
               </svg>
             </button>
-            <span> {product.quantity}</span>
+            <span> {cartItem.quantity}</span>
             <button type="button" onClick={handleDecreaseQuantity}>
               <svg
                 className="w-4"
@@ -158,7 +168,7 @@ function CartList2({ product }: ProductCardProps) {
           </div>
         </div>
         <div className="hidden md:block p-6 text-center">
-          <span className="text-red-500">£‌{subtotal}</span>
+          <span className="text-red-500">${subtotal}</span>
         </div>
       </div>
     </div>

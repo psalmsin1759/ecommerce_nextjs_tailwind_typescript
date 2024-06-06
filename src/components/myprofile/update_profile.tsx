@@ -18,12 +18,20 @@ function UpdateProfile() {
   const { state } = useUser();
   const { dispatch } = useUser();
 
+  let userData: string | null;
+  if (typeof window !== 'undefined') {
+    userData = window.localStorage.getItem('userData');
+  }
+
   useEffect(() => {
-    reset({
-      firstName: state.user?.firstName,
-      lastName: state.user?.lastName,
-      email: state.user?.email,
-    });
+    if (userData) {
+      const user = JSON.parse(userData);
+      reset({
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: user.email,
+      });
+    }
   }, []);
 
   const [isLoading, setIsLoading] = useState(false);

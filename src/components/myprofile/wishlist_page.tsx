@@ -52,8 +52,11 @@ function WishListPage() {
           <Table.HeadCell></Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y border">
-          {wishlists?.map((wishlistProduct: WishlistProduct) => (
-            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800 p-2">
+          {wishlists?.map((wishlistProduct: WishlistProduct, index) => (
+            <Table.Row
+              key={index}
+              className="bg-white dark:border-gray-700 dark:bg-gray-800 p-2"
+            >
               <Image
                 src={imageBasePath + 'product/' + wishlistProduct.image_path}
                 alt={wishlistProduct.name}

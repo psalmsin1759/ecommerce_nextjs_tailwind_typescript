@@ -6,7 +6,7 @@ import { getAllSliders, Slider } from '@/model/slider';
 import { motion } from 'framer-motion';
 import imageBasePath from '@/components/common/path';
 
-function Slider() {
+function MySlider() {
   const [sliders, setSliders] = useState<Slider[]>([]);
 
   useEffect(() => {
@@ -29,23 +29,24 @@ function Slider() {
   };
 
   return (
-    <div className="min-h-400 h-400 w-full ">
+    <div className="h-400  w-full rounded-none">
       <Carousel slideInterval={3000}>
-        {sliders?.map((slider: Slider) => (
-          <div className="relative ">
+        {sliders?.map((slider: Slider, index) => (
+          <div key={index} className="relative ">
             <Image
               alt="..."
               src={imageBasePath + 'slider/' + slider.image_path}
               width={1960}
               height={400}
               sizes="100vw"
-              objectFit=""
+              Object-cover
+              className="h-96 md:h-screen rounded-none"
             />
 
-            <div className="absolute ml-6 left-4 md:left-16 top-1/2 w-1/2 transform -translate-y-1/2 ">
+            <div className="absolute ml-6 left-8 md:left-16 top-1/2 w-1/2 transform -translate-y-1/2 ">
               <div className="flex flex-col gap-1 md:gap-4">
                 <motion.span
-                  className="text-base font-semibold md:text-6xl "
+                  className="text-lg font-semibold md:text-6xl "
                   initial={{ y: -100, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                 >
@@ -60,7 +61,7 @@ function Slider() {
                 </motion.span>
                 <motion.button
                   type="button"
-                  className="py-2 text-white w-24 md:w-44  bg-goldColor hover:bg-primaryColor"
+                  className="py-2 text-white w-24 md:w-44 rounded  bg-goldColor hover:bg-primaryColor"
                   initial={{ y: 100, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                 >
@@ -75,4 +76,4 @@ function Slider() {
   );
 }
 
-export default Slider;
+export default MySlider;

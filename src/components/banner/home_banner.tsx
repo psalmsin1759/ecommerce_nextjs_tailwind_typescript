@@ -22,9 +22,8 @@ function HomeBanner() {
   return (
     <div className="md:grid md:grid-cols-2 md:gap-8 m-4">
       {banners.map((item, index) => (
-        <div className="h-300 w-full mt-4">
+        <div className="h-300 w-full mt-4" key={index}>
           <BannerCard
-            key={index}
             title={item.title}
             imagePath={item.image_path}
             subTitle={item.subtitle}

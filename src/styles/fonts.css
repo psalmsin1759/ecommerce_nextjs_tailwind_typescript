@@ -1,0 +1,12 @@
+/* styles/fonts.css */
+@font-face {
+  font-family: 'FuturaLTPro-Book';
+  src: url('/fonts/FuturaLTPro-Book.woff') format('woff'),
+    url('/fonts/FuturaLTPro-Book.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: 'FuturaLTPro-Book', sans-serif;
+}

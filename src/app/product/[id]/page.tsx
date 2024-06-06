@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Breadcrumb } from 'flowbite-react';
 import { HiHome } from 'react-icons/hi';
-import Footer from '@/components/common/footer';
 import Images from 'next/image';
 import RelatedProductCard from '@/components/product/related_product_card';
 import {
@@ -26,8 +25,8 @@ import imageBasePath from '@/components/common/path';
 import { Modal } from 'flowbite-react';
 import { addToWishList } from '@/model/wishlist';
 import { useUser } from '@/context/UserContext';
-import InnerImageZoom from 'react-inner-image-zoom';
-import ImageMagnifier from '@/components/magnifier/image_magifier';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function ProductPage({ params }: { params: { id: number } }) {
   const [openModal, setOpenModal] = useState(false);
@@ -69,16 +68,53 @@ function ProductPage({ params }: { params: { id: number } }) {
     }
   };
 
+  const [selectedOptions, setSelectedOptions] = useState<string>('');
+
+  /* const handleVariantChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const optionName = event.target.name; // Assuming you set the name attribute on your select element
+    const optionValue = event.target.value;
+
+    const newSelectedVariant = optionName + ' - ' + optionValue;
+    setSelectedOptions(newSelectedVariant);
+    console.log(newSelectedVariant);
+    setSelectedVariant(optionValue);
+  }; */
+
+  const [selectedVariants, setSelectedVariants] = useState<{
+    [key: string]: string;
+  }>({});
+
   const handleVariantChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newSelectedVariant = event.target.value;
-    console.log(selectedVariant);
-    setSelectedVariant(newSelectedVariant);
+    const optionName = event.target.name; // Assuming you set the name attribute on your select element
+    const optionValue = event.target.value;
+
+    console.log(optionName);
+    console.log(optionValue);
+
+    setSelectedVariants((prevState) => ({
+      ...prevState,
+      [optionName]: optionValue,
+    }));
   };
 
   const dispatch = useDispatch();
-  const handleAddToCart = (product: Product, quantity: number) => {
-    console.log(quantity);
-    dispatch(addToCart(product, quantity, ''));
+
+  const handleAddToCart = (
+    product: Product,
+    quantity: number,
+    options: { [key: string]: string }
+  ) => {
+    const selectedOptions = Object.entries(options)
+      .map(([key, value]) => `${key} - ${value}`)
+      .join(', ');
+
+    if (!selectedOptions) {
+      alert('Please select a variant before adding to cart');
+      return;
+    }
+    toast('Added to cart!');
+    console.log(selectedOptions);
+    dispatch(addToCart(product, quantity, selectedOptions));
   };
 
   const groupVariantsByOption = () => {
@@ -170,6 +206,15 @@ function ProductPage({ params }: { params: { id: number } }) {
     }
   }
 
+  const [isZoomed, setIsZoomed] = useState(false);
+
+  const handleZoomChange = useCallback(
+    (shouldZoom: boolean | ((prevState: boolean) => boolean)) => {
+      setIsZoomed(shouldZoom);
+    },
+    []
+  );
+
   return (
     <div className="mt-4 w-screen min-h-60">
       <div className=" bg-gray-100 w-screen items-center p-4">
@@ -184,39 +229,37 @@ function ProductPage({ params }: { params: { id: number } }) {
         <div className=" flex flex-col md:flex-row p-4 gap-1">
           <div className="w-full flex flex-col-reverse md:flex-row gap-4">
             <div className=" flex flex-row  md:w-28 md:flex-col gap-2 ">
-              {product?.images
-                ?.slice(0, 4) // Use slice to get the first 4 images
-                .map((image: Image) => (
-                  <div
-                    className="border shadow mb-4 p-4"
-                    key={image.id}
-                    onClick={() => handleImageClick(image.path)}
-                  >
-                    <Images
-                      src={imageBasePath + 'product/' + image.path}
-                      alt="..."
-                      width={70}
-                      height={95}
-                      Object-cover
-                      className="w-full"
-                    />
-                  </div>
-                ))}
+              {product?.images?.slice(0, 4).map((image: Image) => (
+                <div
+                  className="border shadow mb-4 p-4"
+                  key={image.id}
+                  onClick={() => handleImageClick(image.path)}
+                >
+                  <Images
+                    src={imageBasePath + 'product/' + image.path}
+                    alt="..."
+                    width={70}
+                    height={95}
+                    Object-cover
+                    className="w-full"
+                  />
+                </div>
+              ))}
             </div>
             <div className="grow border shadow p-8">
               {product && product.images && product.images.length > 0 ? (
                 <Images
                   src={imageBasePath + 'product/' + selectedImage}
-                  alt="..."
+                  alt={product.name}
                   width={170}
                   height={250}
                   Object-cover
-                  className="w-full "
+                  className="w-full"
                 />
               ) : (
                 <div>
                   <Images
-                    src={'https://placehold.co/170x250.png'}
+                    src={'/images/placeholder.png'}
                     alt="..."
                     width={170}
                     height={250}
@@ -228,7 +271,7 @@ function ProductPage({ params }: { params: { id: number } }) {
             </div>
           </div>
           <div className="w-full ml-4 mr-4">
-            <span className="text-4xl font-semibold">
+            <span className="text-2xl font-semibold">
               {product?.name.toUpperCase()}
             </span>
             <div className="mt-4">
@@ -259,13 +302,13 @@ function ProductPage({ params }: { params: { id: number } }) {
             </div>
             <div className="mt-6">
               <span className=" text-4xl font-semibold  text-primaryColor">
-                £‌{product?.price}
+                ${product?.price}
               </span>
             </div>
             <div className="mt-4">
               <hr />
             </div>
-            <div className="flex flex-row mt-4 gap-4 items-center">
+            <div className="flex flex-row mt-4 gap-14 items-center">
               <span className="text-gray-500 text-sm">Qty:</span>
               <div className="rounded-full w-32 pl-4 pr-4 pt-2 pb-2 border-2 flex flex-row items-center justify-between gap-2">
                 <button type="button" onClick={increaseQuantity}>
@@ -311,14 +354,14 @@ function ProductPage({ params }: { params: { id: number } }) {
             <div>
               {product?.variants && product?.variants.length > 0 && (
                 <div className="mt-2">
-                  <label htmlFor="variants">Select Variant:</label>
+                  <label htmlFor="variants">Product Options:</label>
                 </div>
               )}
 
               {Object.entries(groupVariantsByOption()).map(
-                ([option, variants]) => (
+                ([option, variants], index) => (
                   <div
-                    className="mt-2 flex flex-row gap-4 items-center w-full"
+                    className="mt-2 flex flex-row  items-center w-full"
                     key={`${option}-${variants
                       .map((variant) => variant.id)
                       .join('-')}`}
@@ -331,14 +374,19 @@ function ProductPage({ params }: { params: { id: number } }) {
                       <select
                         className="pr-16 border rounded w-48"
                         id={`variant-${option}`}
-                        name={`variant-${option}`}
-                        value={selectedVariant!}
+                        name={option}
+                        value={selectedVariants[option] || ''}
                         onChange={handleVariantChange}
                       >
-                        <option value="">Select a Variant</option>
-                        {variants.map((variant: Variant) => (
-                          <option key={variant.id} value={variant.value}>
+                        <option value="">-- select option --</option>
+                        {variants.map((variant: Variant, index) => (
+                          <option
+                            key={index}
+                            value={variant.value}
+                            disabled={variant.quantity === 0}
+                          >
                             {variant.value}
+                            {variant.quantity === 0 && ' - Out of stock'}
                           </option>
                         ))}
                       </select>
@@ -352,37 +400,56 @@ function ProductPage({ params }: { params: { id: number } }) {
             <div className="mt-4">
               <hr />
             </div>
-            <button
-              type="button"
-              onClick={() => handleAddToCart(product!, quantity)}
-              className="flex flex-row gap-2 hover:bg-goldColor bg-black p-2 w-56 mt-4 justify-center items-center rounded-full cursor-pointer"
-            >
-              <svg
-                className="w-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-                ></path>
-              </svg>
-              <span className="text-white text-lg">Add to cart</span>
-            </button>
+            {product ? (
+              product.quantity > 0 ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleAddToCart(product!, quantity, selectedVariants!)
+                  }
+                  className="flex flex-row gap-2 hover:bg-goldColor bg-black p-2 w-56 mt-4 justify-center items-center rounded-full cursor-pointer"
+                >
+                  <svg
+                    className="w-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                    ></path>
+                  </svg>
+                  <span className="text-white text-lg">Add to cart</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="flex flex-row gap-2 bg-gray-300 p-2 w-56 mt-4 justify-center items-center rounded-full cursor-not-allowed"
+                  disabled
+                >
+                  <span className="text-gray-600 text-lg">Out of Stock</span>
+                </button>
+              )
+            ) : (
+              <span className="text-sm font-semibold">
+                Product not available
+              </span>
+            )}
+            <ToastContainer />
             <div className="flex flex-row mt-4 gap-2 cursor-pointer">
               <button
-                className="hover:text-primaryColor cursor-pointer"
+                className="hover:text-primaryColor  cursor-pointer"
                 onClick={() => addProductToWishlist(product!.name)}
               >
                 Add to wishlist
               </button>{' '}
               <span
-                className="hover:text-primaryColor cursor-pointer"
+                className="text-primaryColor hover:text-goldColor cursor-pointer underline "
                 onClick={() => setOpenModal(true)}
               >
                 Size chart
@@ -403,10 +470,11 @@ function ProductPage({ params }: { params: { id: number } }) {
           style="underline"
         >
           <Tabs.Item active title="Description">
-            <span
-              className="p-2"
-              dangerouslySetInnerHTML={{ __html: product?.description ?? '' }}
-            ></span>
+            <div className="p-4">
+              <span
+                dangerouslySetInnerHTML={{ __html: product?.description ?? '' }}
+              ></span>
+            </div>
           </Tabs.Item>
           <Tabs.Item title="Review">
             <div className="w-full p-2 flex flex-col justify-center items-center">
@@ -467,8 +535,8 @@ function ProductPage({ params }: { params: { id: number } }) {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 m-2">
-        {relatedProducts?.map((product: RelatedProduct) => (
-          <RelatedProductCard product={product} />
+        {relatedProducts?.map((product: RelatedProduct, index) => (
+          <RelatedProductCard key={index} product={product} />
         ))}
       </div>
 
@@ -489,8 +557,6 @@ function ProductPage({ params }: { params: { id: number } }) {
           </div>
         </Modal.Body>
       </Modal>
-
-      <Footer />
     </div>
   );
 }

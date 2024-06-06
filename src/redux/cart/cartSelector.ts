@@ -1,6 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '@/redux/store';
 import { Product } from '@/model/Product';
+import { CartItem } from './cartSlice';
 
 export const selectCart = (state: RootState) => state.cart;
 
@@ -20,7 +21,7 @@ export const addToCart = (
     payload: {
       product,
       quantity,
-      options, // Pass the product options as a string
+      options,
     },
   };
 };
@@ -34,10 +35,10 @@ export const selectTotalProductsInCart = createSelector(
 // Select the total price for each product
 export const selectTotalPriceForProduct = createSelector(
   [selectCartItems],
-  (items: Product[]) =>
+  (items: CartItem[]) =>
     items.map((item) => ({
       product: item,
-      totalPrice: (item.price * item.quantity).toFixed(2), // Calculate total price for each product
+      totalPrice: (item.product.price * item.quantity).toFixed(2), // Calculate total price for each product
     }))
 );
 
@@ -45,9 +46,9 @@ export const selectTotalPriceForProduct = createSelector(
 export const selectSubtotalForProduct = createSelector(
   [selectCartItems],
   (cart) => (productId: number) => {
-    const item = cart.find((item) => item.id === productId);
+    const item = cart.find((item) => item.product.id === productId);
     if (item) {
-      return item.price * item.quantity;
+      return item.product.price * item.quantity;
     }
     return 0; // Default to 0 if the product is not found
   }
@@ -58,7 +59,7 @@ export const selectTotalGrandPrice = createSelector(
   [selectCartItems],
   (items) =>
     items
-      .reduce((total, item) => total + item.price * item.quantity, 0)
+      .reduce((total, item) => total + item.product.price * item.quantity, 0)
       .toFixed(2)
 );
 

@@ -15,12 +15,15 @@ import { useUser } from '@/context/UserContext';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { addToCart } from '@/redux/cart/cartSelector';
+import { useRouter } from 'next/navigation';
 
 interface ProductCardProps {
   product: Product;
 }
 
 function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter();
+
   const [openModal, setOpenModal] = useState<string | undefined>();
   const props = { openModal, setOpenModal };
   const isAvailable = product.in_stock > 0;
@@ -43,7 +46,11 @@ function ProductCard({ product }: ProductCardProps) {
 
   const dispatch = useDispatch();
   const handleAddToCart = () => {
-    dispatch(addToCart(product, quantity, ''));
+    if (product.variants && product.variants.length > 0) {
+      router.push(`/product/${product.id}`);
+    } else {
+      dispatch(addToCart(product, quantity, ''));
+    }
   };
 
   const { state } = useUser();
@@ -93,22 +100,23 @@ function ProductCard({ product }: ProductCardProps) {
           {product.discounted_price > 0 ? (
             <div className="flex flex-col md:flex-row md:gap-2  items-center">
               <span className="text-base md:text-xl font-semibold">
-                £‌{product.discounted_price}
+                ${product.discounted_price}
               </span>
               <del>
                 {' '}
                 <span className="text-base md:text-xl text-gray-500">
-                  £‌{product.price}
+                  ${product.price}
                 </span>
               </del>
             </div>
           ) : (
             <span className="text-base md:text-xl font-semibold">
-              £‌{product.price}
+              ${product.price}
             </span>
           )}
         </div>
-        <div className="absolute top-64 left-0 right-0 flex flex-row gap-2 justify-center opacity-0 transition-opacity group-hover:opacity-100">
+
+        <div className="absolute top-64 left-0 right-0 flex flex-row gap-2 justify-center opacity-0 transition-opacity md:group-hover:opacity-100">
           <button
             type="button"
             className="whiteToPrimaryColorButton px-4 py-2 shadow"
@@ -175,7 +183,7 @@ function ProductCard({ product }: ProductCardProps) {
                 </div>
                 <hr className="mt-4 mb-4" />
                 <span className="text-2xl mt-4 mb-4 font-semibold">
-                  £‌{product.price}
+                  ${product.price}
                 </span>
                 <hr className="mt-4" />
                 <div className="flex flex-row mt-4 gap-4 items-center">

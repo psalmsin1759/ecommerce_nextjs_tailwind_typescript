@@ -1,3 +1,3 @@
-const imageBasePath = 'http://localhost:8888/eppagelia_api/public/images/';
+const imageBasePath = 'https://canadabackend.samsonude.dev/images/';
 
 export default imageBasePath;
