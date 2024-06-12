@@ -1,3 +1,3 @@
-const imageBasePath = 'https://canadabackend.samsonude.dev/images/';
+const imageBasePath = 'https://storage.googleapis.com/bakersluxury/';
 
 export default imageBasePath;
