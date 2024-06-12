@@ -24,7 +24,6 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@/context/UserContext';
 
 export default function HeaderNew() {
-  //const dispatch = useDispatch();
   const totalCount = useSelector(selectTotalProductsInCart);
 
   const [showCartPanel, setShowCartPanel] = useState(false);
